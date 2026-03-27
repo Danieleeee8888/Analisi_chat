@@ -14,8 +14,12 @@ function setVisualState(state, message) {
   statusBox.textContent = message;
 }
 
-function showResult(outputPath, outputDir) {
-  outputPathEl.textContent = outputPath;
+function showResult(outputPath, outputDir, metricsPath) {
+  const parts = [outputPath];
+  if (metricsPath) {
+    parts.push(metricsPath);
+  }
+  outputPathEl.textContent = parts.join("\n");
   latestOutputDir = outputDir;
   resultBox.classList.remove("hidden");
 }
@@ -44,8 +48,9 @@ async function runAnonymization(zipPath) {
     if (response.ok) {
       const outputPath = response.result.outputPath;
       const folder = response.result.outputDir;
+      const metricsPath = response.result.metricsPath;
       setVisualState("done", "Anonimizzazione completata con successo.");
-      showResult(outputPath, folder);
+      showResult(outputPath, folder, metricsPath);
       return;
     }
 

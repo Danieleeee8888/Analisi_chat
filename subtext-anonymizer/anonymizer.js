@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const os = require("os");
 const AdmZip = require("adm-zip");
+const { buildRelationalMetricsReport } = require("./relational-metrics");
 
 const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024;
 
@@ -255,16 +256,22 @@ async function anonymizeWhatsappZip(zipPath, options = {}) {
   const baseName = path.basename(zipPath, path.extname(zipPath));
   const outputFileName = `${baseName}_anonimizzato.txt`;
   const logFileName = `${baseName}_log.txt`;
+  const metricsFileName = `${baseName}_metrics.json`;
 
   const outputPath = path.join(resolvedOutputDir, outputFileName);
   const logPath = path.join(resolvedOutputDir, logFileName);
+  const metricsPath = path.join(resolvedOutputDir, metricsFileName);
 
   fs.writeFileSync(outputPath, anonymizedText, "utf8");
   fs.writeFileSync(logPath, createLogContent(participantMap, counts), "utf8");
 
+  const metricsReport = buildRelationalMetricsReport(anonymizedText);
+  fs.writeFileSync(metricsPath, JSON.stringify(metricsReport, null, 2), "utf8");
+
   return {
     outputPath,
     logPath,
+    metricsPath,
     outputDir: resolvedOutputDir,
     participants: Array.from(participantMap.entries()).map(([realName, alias]) => ({
       realName,
@@ -276,5 +283,6 @@ async function anonymizeWhatsappZip(zipPath, options = {}) {
 
 module.exports = {
   anonymizeWhatsappZip,
-  AnonymizerWarning
+  AnonymizerWarning,
+  buildRelationalMetricsReport
 };
