@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Subtext Anonymizer</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <h1>Subtext Anonymizer</h1>
+      <p class="subtitle">Anonimizzazione chat WhatsApp in locale</p>
+
+      <section id="dropzone" class="dropzone idle">
+        <p id="dropText">Trascina qui il tuo file .zip di WhatsApp</p>
+        <p class="hint">Supportato: file .zip esportato da WhatsApp</p>
+      </section>
+
+      <section id="status" class="status idle">In attesa di un file .zip</section>
+
+      <section id="result" class="result hidden">
+        <p id="outputPath"></p>
+        <button id="openFolderBtn" type="button">Apri cartella</button>
+      </section>
+    </main>
+
+    <script src="./renderer.js"></script>
+  </body>
+</html>

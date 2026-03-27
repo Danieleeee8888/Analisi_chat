@@ -1,0 +1,23 @@
+{
+  "name": "subtext-anonymizer",
+  "version": "1.0.0",
+  "description": "Desktop app Electron per anonimizzare chat WhatsApp in locale",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [
+    "electron",
+    "whatsapp",
+    "anonymizer",
+    "privacy"
+  ],
+  "author": "Subtext",
+  "license": "MIT",
+  "dependencies": {
+    "adm-zip": "^0.5.16"
+  },
+  "devDependencies": {
+    "electron": "^37.2.0"
+  }
+}

@@ -1,0 +1,5 @@
+# Chat esportate e output locali (non versionare)
+data/
+
+# Dipendenze Node
+subtext-anonymizer/node_modules/
