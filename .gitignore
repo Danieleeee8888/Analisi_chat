@@ -2,4 +2,4 @@
 data/
 
 # Dipendenze Node
-subtext-anonymizer/node_modules/
+node_modules/

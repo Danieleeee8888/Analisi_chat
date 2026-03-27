@@ -19,7 +19,11 @@ function buildDate(d, mo, y, h, mi, s) {
  * @returns {{ ts: number, date: Date, sender: string, body: string, lineIndex: number }[]}
  */
 function parseWhatsAppChat(text) {
-  const lines = text.split(/\r?\n/);
+  const normalized = text
+    .replace(/\u2028/g, "\n")
+    .replace(/\u2029/g, "\n")
+    .replace(/\u0085/g, "\n");
+  const lines = normalized.split(/\r?\n/);
   const messages = [];
   let current = null;
 

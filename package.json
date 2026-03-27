@@ -1,0 +1,11 @@
+{
+  "name": "nuova-analisi-chat",
+  "private": true,
+  "description": "Workspace: app Subtext Anonymizer in subtext-anonymizer/",
+  "workspaces": [
+    "subtext-anonymizer"
+  ],
+  "scripts": {
+    "start": "npm run start -w subtext-anonymizer"
+  }
+}

@@ -19,6 +19,14 @@ function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+/** LS/PS/NEXT LINE spesso presenti in export o copia-incolla; normalizza a \n per parser e editor. */
+function normalizeUnusualLineTerminators(text) {
+  return text
+    .replace(/\u2028/g, "\n")
+    .replace(/\u2029/g, "\n")
+    .replace(/\u0085/g, "\n");
+}
+
 function selectTxtEntry(entries) {
   const txtEntries = entries.filter(
     (entry) => !entry.isDirectory && entry.entryName.toLowerCase().endsWith(".txt")
@@ -105,7 +113,7 @@ function anonymizeText(originalText, participantMap) {
     cifre: 0
   };
 
-  let text = originalText;
+  let text = normalizeUnusualLineTerminators(originalText);
 
   // STEP 4 - Nomi partecipanti
   const participantCounter = { count: 0 };
@@ -237,7 +245,7 @@ async function anonymizeWhatsappZip(zipPath, options = {}) {
   }
 
   const txtBuffer = txtEntry.getData();
-  const originalText = txtBuffer.toString("utf8");
+  const originalText = normalizeUnusualLineTerminators(txtBuffer.toString("utf8"));
 
   const whatsappLike = hasWhatsappHeaders(originalText);
   if (!whatsappLike && !proceedWithoutWhatsappPattern) {
