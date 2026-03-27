@@ -3,9 +3,11 @@
   "private": true,
   "description": "Workspace: app Subtext Anonymizer in subtext-anonymizer/",
   "workspaces": [
-    "subtext-anonymizer"
+    "subtext-anonymizer",
+    "subtext-webapp"
   ],
   "scripts": {
-    "start": "npm run start -w subtext-anonymizer"
+    "start": "npm run start -w subtext-anonymizer",
+    "dev:web": "npm run dev -w subtext-webapp"
   }
 }
