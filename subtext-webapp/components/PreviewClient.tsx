@@ -22,7 +22,7 @@ export function PreviewClient() {
   if (payload === undefined) {
     return (
       <div className="mx-auto max-w-2xl flex-1 px-4 py-12 sm:px-6">
-        <p className="text-stone-600">Caricamento…</p>
+        <p className="font-ui text-muted">Caricamento…</p>
       </div>
     );
   }
@@ -30,15 +30,15 @@ export function PreviewClient() {
   if (!payload) {
     return (
       <div className="mx-auto max-w-2xl flex-1 px-4 py-12 sm:px-6">
-        <p className="text-sm text-stone-500">
-          <Link href="/upload" className="text-stone-700 hover:text-stone-900">
+        <p className="font-ui text-sm text-muted">
+          <Link href="/upload" className="nav-link text-muted hover:text-foreground">
             ← Carica chat
           </Link>
         </p>
-        <h1 className="mt-6 text-2xl font-semibold text-stone-900">
+        <h1 className="font-display mt-6 text-3xl font-bold tracking-tight text-foreground">
           Nessun risultato
         </h1>
-        <p className="mt-4 text-stone-600">
+        <p className="font-ui mt-4 text-muted">
           Non c&apos;è un&apos;analisi in questa sessione. Torna all&apos;upload,
           invia la chat e poi verrai reindirizzato qui.
         </p>
@@ -48,15 +48,15 @@ export function PreviewClient() {
 
   return (
     <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-10 sm:max-w-3xl sm:px-6 sm:py-12">
-      <p className="text-sm text-stone-500">
-        <Link href="/upload" className="text-stone-700 hover:text-stone-900">
+      <p className="font-ui text-sm text-muted">
+        <Link href="/upload" className="nav-link text-muted hover:text-foreground">
           ← Carica un&apos;altra chat
         </Link>
       </p>
-      <h1 className="mt-6 text-2xl font-semibold tracking-tight text-stone-900 sm:text-3xl">
+      <h1 className="font-display mt-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
         La tua pre-analisi gratuita
       </h1>
-      <p className="mt-3 max-w-2xl text-stone-600">
+      <p className="font-ui mt-3 max-w-2xl leading-relaxed text-muted">
         Metriche calcolate sul testo anonimizzato. I dati restano solo in questa
         sessione del browser finché non chiudi la scheda.
       </p>

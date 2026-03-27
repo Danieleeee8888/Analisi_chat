@@ -1,11 +1,13 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { ContextFormData } from "./context-form-types";
-import { RELATIONSHIP_OPTIONS } from "./context-form-types";
+import { RELATIONSHIP_OPTIONS, RELATIONSHIP_OPTIONS_ENTERPRISE } from "./context-form-types";
 import { stripMetricsForReportPayload } from "./metrics-for-llm";
 import { SUBTEXT_SYSTEM_PROMPT } from "./prompt";
 
-function relationshipLabel(v: ContextFormData["relationshipType"]): string {
-  return RELATIONSHIP_OPTIONS.find((o) => o.value === v)?.label ?? v;
+function relationshipLabel(form: ContextFormData): string {
+  const opts =
+    form.audienceSegment === "enterprise" ? RELATIONSHIP_OPTIONS_ENTERPRISE : RELATIONSHIP_OPTIONS;
+  return opts.find((o) => o.value === form.relationshipType)?.label ?? form.relationshipType;
 }
 
 function howLongLabel(v: string): string {
@@ -38,11 +40,16 @@ export function buildReportUserMessage(
 ): string {
   const metricsLite = stripMetricsForReportPayload(metrics);
   const live = formData.liveOrWorkTogether === "si" ? "Sì" : "No";
+  const segmentLine =
+    formData.audienceSegment === "enterprise"
+      ? "Organizzazioni / contesto professionale (tono: produttività, chiarezza, governance leggera — niente gossip)."
+      : "Percorso privati (tono: relazioni personali, reciprocità, benessere — rispetto e non giudizio).";
 
   return `Analizza questa chat usando le metriche allegate.
 
 DATI DEL FORM:
-- Tipo di relazione: ${relationshipLabel(formData.relationshipType)}
+- Percorso: ${segmentLine}
+- Tipo di relazione / contesto: ${relationshipLabel(formData)}
 - Chi sei tu in chat (come indicato): ${formData.whoAreYou.trim() || "—"}
 - Da quanto vi conoscete: ${howLongLabel(formData.howLongKnown)}
 - Vivete o lavorate insieme: ${live}

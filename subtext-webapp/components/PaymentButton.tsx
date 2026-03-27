@@ -64,22 +64,15 @@ export function PaymentButton() {
         type="button"
         onClick={onClick}
         disabled={loading}
-        className="w-full rounded-lg bg-stone-900 px-4 py-3.5 text-sm font-medium text-white shadow-sm transition hover:bg-stone-800 disabled:cursor-wait disabled:opacity-80 sm:w-auto"
+        className="font-ui w-full rounded-lg bg-white px-4 py-3.5 text-sm font-bold text-accent shadow-sm transition hover:bg-white/95 active:scale-[0.98] disabled:cursor-wait disabled:opacity-90 sm:w-auto"
       >
-        {loading ? "Collegamento a Stripe…" : "Ottieni il report completo — 4,99€"}
+        {loading ? "Collegamento a Stripe…" : "Ottieni il report completo"}
       </button>
       {err ? (
-        <p className="text-sm text-red-800" role="alert">
+        <p className="font-ui text-sm font-medium text-red-100" role="alert">
           {err}
         </p>
-      ) : (
-        <p className="text-xs text-amber-900/80">
-          Il pagamento si apre su Stripe Checkout in ambiente sicuro. Senza chiavi
-          configurate, il pulsante mostrerà un messaggio finché non aggiungi{" "}
-          <code className="rounded bg-amber-100/80 px-1">STRIPE_SECRET_KEY</code> in{" "}
-          <code className="rounded bg-amber-100/80 px-1">.env.local</code>.
-        </p>
-      )}
+      ) : null}
     </div>
   );
 }

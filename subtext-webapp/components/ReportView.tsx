@@ -27,37 +27,37 @@ export function ReportView({ markdown, demo }: ReportViewProps) {
   }
 
   return (
-    <article className="report-document mx-auto max-w-3xl px-4 py-10 sm:px-8 sm:py-14">
+    <article className="report-document mx-auto max-w-[680px] bg-white px-4 py-10 sm:px-6 sm:py-14">
       {demo ? (
-        <p className="mb-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+        <p className="font-ui mb-8 rounded-xl border border-accent-light bg-accent-light px-4 py-3 text-sm text-accent-dark">
           Stai visualizzando un <strong>report dimostrativo</strong>. Configura
           Anthropic in produzione per il testo generato da Claude.
         </p>
       ) : null}
-      <div className="mb-10 flex flex-wrap items-center gap-3 border-b border-stone-200 pb-8">
+      <div className="mb-10 flex flex-wrap items-center gap-3 border-b border-[var(--border)] pb-8">
         <button
           type="button"
           onClick={tryPdf}
-          className="rounded-lg border border-stone-300 bg-white px-4 py-2 text-sm font-medium text-stone-800 shadow-sm hover:bg-stone-50"
+          className="font-ui rounded-lg border border-[var(--border)] bg-white px-4 py-2 text-sm font-semibold text-foreground shadow-sm transition hover:bg-surface active:scale-[0.98]"
         >
           Scarica PDF
         </button>
-        <span className="text-xs text-stone-500">
+        <span className="font-ui text-xs text-muted">
           In sviluppo: per ora puoi usare Stampa → Salva come PDF dal browser.
         </span>
       </div>
       {pdfHint ? (
-        <p className="mb-6 text-sm text-stone-600" role="status">
+        <p className="font-ui mb-6 text-sm text-muted" role="status">
           {pdfHint}
         </p>
       ) : null}
       <div
         className={[
-          "prose prose-stone max-w-none",
-          "prose-headings:font-sans prose-headings:tracking-tight",
+          "prose prose-report max-w-none text-foreground",
+          "prose-headings:font-display prose-headings:font-bold prose-headings:tracking-tight",
           "prose-h1:text-3xl prose-h2:text-xl prose-h2:mt-10",
-          "prose-p:font-serif prose-p:leading-relaxed",
-          "prose-li:font-serif"
+          "prose-p:text-[17px] prose-p:leading-[1.8]",
+          "prose-li:text-[17px] prose-li:leading-[1.8]"
         ].join(" ")}
       >
         <ReactMarkdown>{markdown}</ReactMarkdown>
@@ -65,4 +65,3 @@ export function ReportView({ markdown, demo }: ReportViewProps) {
     </article>
   );
 }
-

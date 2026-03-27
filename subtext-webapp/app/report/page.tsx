@@ -10,7 +10,7 @@ export default function ReportPage() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto max-w-xl px-4 py-20 text-center text-stone-600 sm:px-6">
+        <div className="mx-auto max-w-xl px-4 py-20 text-center font-ui text-muted sm:px-6">
           Caricamento…
         </div>
       }

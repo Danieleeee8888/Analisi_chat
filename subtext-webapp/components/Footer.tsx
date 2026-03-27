@@ -2,14 +2,17 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="border-t border-stone-200 bg-stone-50/80">
-      <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-3 px-4 py-8 text-sm text-stone-600 sm:flex-row sm:px-6">
-        <p className="text-stone-500">&copy; Subtext 2026</p>
-        <div className="flex gap-6">
-          <Link href="/privacy" className="hover:text-stone-900">
+    <footer className="relative z-[1] border-t border-[var(--border)] bg-surface">
+      <div className="mx-auto flex max-w-[1200px] flex-col items-start justify-between gap-4 px-4 py-10 sm:flex-row sm:items-center sm:px-6">
+        <p className="font-ui text-[13px] text-muted">
+          Subtext ·{" "}
+          <span className="text-accent3">La struttura prima della storia.</span>
+        </p>
+        <div className="flex gap-8 font-ui text-[13px]">
+          <Link href="/privacy" className="nav-link font-medium">
             Privacy
           </Link>
-          <Link href="/contatti" className="hover:text-stone-900">
+          <Link href="/contatti" className="nav-link font-medium">
             Contatti
           </Link>
         </div>

@@ -4,8 +4,14 @@ import {
   buildParticipantMap,
   hasWhatsappHeaders
 } from "@/lib/anonymizer";
-import { parseWhatsAppChat } from "@/lib/chat-parser";
-import type { ContextFormData, RelationshipType } from "@/lib/context-form-types";
+import { messagesToWhatsAppAndroidExport, parseWhatsAppChat } from "@/lib/chat-parser";
+import {
+  parseAnalysisPeriod,
+  parseAudienceSegment,
+  type AnalysisPeriod,
+  type ContextFormData,
+  type RelationshipType
+} from "@/lib/context-form-types";
 import { MAX_ZIP_BYTES, MIN_MESSAGES_FOR_ANALYSIS } from "@/lib/process-chat-constants";
 import { buildRelationalMetricsReport } from "@/lib/relational-metrics";
 import { extractWhatsappTxtFromZipBuffer } from "@/lib/whatsapp-zip";
@@ -42,13 +48,18 @@ function parseContextJson(raw: unknown): ContextFormData | null {
   if (typeof c.ageBand !== "string") return null;
   if (typeof c.specificQuestion !== "string" && c.specificQuestion !== undefined) return null;
 
+  const analysisPeriod: AnalysisPeriod = parseAnalysisPeriod(c.analysisPeriod);
+  const audienceSegment = parseAudienceSegment(c.audienceSegment);
+
   return {
+    audienceSegment,
     relationshipType: c.relationshipType,
     whoAreYou: c.whoAreYou,
     howLongKnown: c.howLongKnown,
     liveOrWorkTogether: c.liveOrWorkTogether,
     ageBand: c.ageBand,
-    specificQuestion: typeof c.specificQuestion === "string" ? c.specificQuestion : ""
+    specificQuestion: typeof c.specificQuestion === "string" ? c.specificQuestion : "",
+    analysisPeriod
   };
 }
 
@@ -114,28 +125,49 @@ export async function POST(req: Request) {
     );
   }
 
-  let messages;
+  let allMessages;
   try {
-    messages = parseWhatsAppChat(rawText);
+    allMessages = parseWhatsAppChat(rawText);
   } catch {
     return jsonError("Impossibile analizzare il formato dei messaggi.", 400);
   }
 
-  if (messages.length === 0) {
+  if (allMessages.length === 0) {
     return jsonError("Nessun messaggio trovato nel file.", 400);
   }
 
-  if (messages.length < MIN_MESSAGES_FOR_ANALYSIS) {
+  const cutoffDate = new Date();
+  const period = context.analysisPeriod;
+  let filteredMessages = allMessages;
+  if (period === "2months") {
+    cutoffDate.setMonth(cutoffDate.getMonth() - 2);
+    filteredMessages = allMessages.filter((m) => m.date >= cutoffDate);
+  } else if (period === "6months") {
+    cutoffDate.setMonth(cutoffDate.getMonth() - 6);
+    filteredMessages = allMessages.filter((m) => m.date >= cutoffDate);
+  }
+
+  if (filteredMessages.length === 0) {
     return jsonError(
-      `Servono almeno ${MIN_MESSAGES_FOR_ANALYSIS} messaggi per l’analisi. ` +
-        `Nel file ne sono stati trovati ${messages.length}. Scegli un export più completo.`,
+      "Nessun messaggio nel periodo selezionato. Prova «Tutta la chat» o un export più recente.",
+      400,
+      "PERIOD_EMPTY"
+    );
+  }
+
+  if (filteredMessages.length < MIN_MESSAGES_FOR_ANALYSIS) {
+    return jsonError(
+      `Servono almeno ${MIN_MESSAGES_FOR_ANALYSIS} messaggi per l’analisi nel periodo scelto. ` +
+        `Ne risultano ${filteredMessages.length}. Scegli un periodo più ampio o un export più completo.`,
       400,
       "TOO_FEW_MESSAGES"
     );
   }
 
-  const participantMap = buildParticipantMap(rawText);
-  const { anonymizedText } = anonymizeText(rawText, participantMap);
+  const filteredText = messagesToWhatsAppAndroidExport(filteredMessages);
+
+  const participantMap = buildParticipantMap(filteredText);
+  const { anonymizedText } = anonymizeText(filteredText, participantMap);
   const metrics = buildRelationalMetricsReport(anonymizedText);
   if ("error" in metrics && typeof metrics.error === "string" && metrics.error) {
     return jsonError(`Elaborazione metriche: ${metrics.error}`, 500);

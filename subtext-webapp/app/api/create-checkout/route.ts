@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import type { ContextFormData, RelationshipType } from "@/lib/context-form-types";
+import {
+  parseAnalysisPeriod,
+  parseAudienceSegment,
+  periodOptionsForSegment
+} from "@/lib/context-form-types";
 import { putCheckoutBundle } from "@/lib/checkout-session-store";
 import { getStripe, isStripeConfigured } from "@/lib/stripe-server";
 
@@ -14,7 +19,7 @@ const RELATIONSHIP_TYPES: RelationshipType[] = [
   "lavoro"
 ];
 
-function isContextFormData(o: unknown): o is ContextFormData {
+function isCheckoutFormBase(o: unknown): o is Record<string, unknown> {
   if (!o || typeof o !== "object") return false;
   const x = o as Record<string, unknown>;
   return (
@@ -26,6 +31,19 @@ function isContextFormData(o: unknown): o is ContextFormData {
     (x.liveOrWorkTogether === "si" || x.liveOrWorkTogether === "no") &&
     typeof x.specificQuestion === "string"
   );
+}
+
+function toContextFormData(raw: Record<string, unknown>): ContextFormData {
+  return {
+    audienceSegment: parseAudienceSegment(raw.audienceSegment),
+    relationshipType: raw.relationshipType as RelationshipType,
+    whoAreYou: raw.whoAreYou as string,
+    howLongKnown: raw.howLongKnown as string,
+    liveOrWorkTogether: raw.liveOrWorkTogether as "si" | "no",
+    ageBand: raw.ageBand as string,
+    specificQuestion: raw.specificQuestion as string,
+    analysisPeriod: parseAnalysisPeriod(raw.analysisPeriod)
+  };
 }
 
 export async function POST(req: Request) {
@@ -58,25 +76,31 @@ export async function POST(req: Request) {
   if (typeof b.anonymizedChat !== "string" || !b.anonymizedChat.trim()) {
     return NextResponse.json({ ok: false, error: "Chat anonima mancante" }, { status: 400 });
   }
-  if (!isContextFormData(b.formData)) {
+  if (!isCheckoutFormBase(b.formData)) {
     return NextResponse.json({ ok: false, error: "Dati modulo non validi" }, { status: 400 });
   }
   if (!Array.isArray(b.participantMap) || !b.participantMap.every((x) => typeof x === "string")) {
     return NextResponse.json({ ok: false, error: "participantMap non valido" }, { status: 400 });
   }
 
+  const formDataNormalized = toContextFormData(b.formData);
+  const period = formDataNormalized.analysisPeriod;
+  const segment = formDataNormalized.audienceSegment;
+  const priceTable = periodOptionsForSegment(segment);
+
   const internalId = putCheckoutBundle({
     anonymizedChat: b.anonymizedChat,
     metrics: b.metrics,
-    formData: b.formData,
+    formData: formDataNormalized,
     participantMap: b.participantMap as string[]
   });
 
   const baseUrl =
     process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/$/, "") || "http://localhost:3000";
-  const unitAmount = parseInt(process.env.REPORT_PRICE_EUR || "499", 10);
+  const periodOption = priceTable.find((o) => o.value === period);
+  const unitAmount = periodOption?.priceAmount ?? 499;
   if (Number.isNaN(unitAmount) || unitAmount < 50) {
-    return NextResponse.json({ ok: false, error: "REPORT_PRICE_EUR non valido" }, { status: 500 });
+    return NextResponse.json({ ok: false, error: "Importo prezzo non valido" }, { status: 500 });
   }
 
   try {
@@ -92,7 +116,10 @@ export async function POST(req: Request) {
             unit_amount: unitAmount,
             product_data: {
               name: "Report Subtext",
-              description: "Report completo analisi chat (una tantum)"
+              description:
+                segment === "enterprise"
+                  ? `Report organizzazioni — ${periodOption?.label ?? "semestre"} (metriche + testo)`
+                  : `Analisi ${periodOption?.label ?? "6 mesi"} — report comunicativo completo`
             }
           },
           quantity: 1

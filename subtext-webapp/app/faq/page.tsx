@@ -43,19 +43,19 @@ const items: { q: string; a: string }[] = [
 export default function FaqPage() {
   return (
     <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-12 sm:px-6">
-      <p className="text-sm text-stone-500">
-        <Link href="/" className="text-stone-700 hover:text-stone-900">
+      <p className="font-ui text-sm text-muted">
+        <Link href="/" className="nav-link text-muted hover:text-foreground">
           ← Home
         </Link>
       </p>
-      <h1 className="mt-6 text-2xl font-semibold text-stone-900">
+      <h1 className="font-display mt-6 text-3xl font-medium tracking-tight text-foreground">
         Domande frequenti
       </h1>
       <dl className="mt-10 space-y-10">
         {items.map((item) => (
           <div key={item.q}>
-            <dt className="font-semibold text-stone-900">{item.q}</dt>
-            <dd className="mt-2 leading-relaxed text-stone-700">{item.a}</dd>
+            <dt className="font-ui font-semibold text-foreground">{item.q}</dt>
+            <dd className="font-ui mt-2 leading-relaxed text-muted">{item.a}</dd>
           </div>
         ))}
       </dl>

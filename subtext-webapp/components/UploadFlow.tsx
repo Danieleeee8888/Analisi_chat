@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ContextForm } from "@/components/ContextForm";
 import { UploadZone } from "@/components/UploadZone";
-import type { ContextFormData } from "@/lib/context-form-types";
+import type { AudienceSegment, ContextFormData } from "@/lib/context-form-types";
 import { PREVIEW_SESSION_KEY, type PreviewSessionPayload } from "@/lib/preview-storage";
 
 type ProcessChatOk = {
@@ -21,14 +21,67 @@ type ProcessChatErr = {
   error: string;
 };
 
-export function UploadFlow() {
+export function UploadFlow({
+  audienceSegment = "personal"
+}: {
+  audienceSegment?: AudienceSegment;
+}) {
+  const isEnt = audienceSegment === "enterprise";
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [participants, setParticipants] = useState<string[]>([]);
+  const [chatMeta, setChatMeta] = useState<{
+    approxTotal: number;
+    firstDate: string | null;
+    lastDate: string | null;
+  } | null>(null);
+  const [isPeeking, setIsPeeking] = useState(false);
 
   useEffect(() => {
     if (!file) setApiError(null);
+  }, [file]);
+
+  useEffect(() => {
+    if (!file) {
+      setParticipants([]);
+      setChatMeta(null);
+      return;
+    }
+
+    setParticipants([]);
+    setChatMeta(null);
+
+    const peek = async () => {
+      setIsPeeking(true);
+      const fd = new FormData();
+      fd.append("file", file);
+      try {
+        const res = await fetch("/api/peek-chat", { method: "POST", body: fd });
+        const data = (await res.json()) as {
+          ok?: boolean;
+          participants?: string[];
+          approxTotal?: number;
+          firstDate?: string | null;
+          lastDate?: string | null;
+        };
+        if (data.ok) {
+          setParticipants(data.participants ?? []);
+          setChatMeta({
+            approxTotal: data.approxTotal ?? 0,
+            firstDate: data.firstDate ?? null,
+            lastDate: data.lastDate ?? null
+          });
+        }
+      } catch {
+        /* peek opzionale */
+      } finally {
+        setIsPeeking(false);
+      }
+    };
+
+    void peek();
   }, [file]);
 
   const handleAnalyze = async (formData: ContextFormData) => {
@@ -86,23 +139,32 @@ export function UploadFlow() {
 
   return (
     <>
-      <p className="text-sm text-stone-500">
-        <Link href="/" className="text-stone-700 hover:text-stone-900">
+      <p className="font-ui text-sm text-muted">
+        <Link href="/" className="nav-link text-muted hover:text-foreground">
           ← Home
         </Link>
       </p>
-      <h1 className="mt-6 text-2xl font-semibold text-stone-900">
-        Carica la tua chat
+      <h1 className="font-display mt-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+        {isEnt ? "Carica la conversazione da analizzare" : "Carica la tua chat"}
       </h1>
-      <p className="mt-3 max-w-xl text-stone-600">
-        Esporta la conversazione da WhatsApp come file .zip (senza media se vuoi
-        ridurre le dimensioni). L&apos;elaborazione avviene sul server in memoria:
-        nessun salvataggio persistente della chat lato applicazione, come da
-        policy in evoluzione.
+      <p className="font-ui mt-3 max-w-xl leading-relaxed text-muted">
+        {isEnt ? (
+          <>
+            Export WhatsApp (.zip) di canali con clienti, fornitori o team. Stesso trattamento
+            sicuro: parsing in memoria, anonimizzazione prima dell&apos;AI, listino e contesto
+            modulati per organizzazioni.
+          </>
+        ) : (
+          <>
+            Esporta la conversazione da WhatsApp come file .zip (senza media se vuoi ridurre le
+            dimensioni). L&apos;elaborazione avviene sul server in memoria: nessun salvataggio
+            persistente della chat lato applicazione, come da policy in evoluzione.
+          </>
+        )}
       </p>
 
       <section className="mt-10">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500">
+        <h2 className="font-ui text-xs font-semibold uppercase tracking-[0.2em] text-muted">
           1. File
         </h2>
         <div className="mt-4">
@@ -114,20 +176,41 @@ export function UploadFlow() {
         </div>
       </section>
 
+      {file && isPeeking && (
+        <div
+          className="font-ui mt-6 flex items-center gap-2 py-4 text-sm text-muted"
+          role="status"
+          aria-live="polite"
+        >
+          <div
+            className={`h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-t-transparent ${
+              isEnt ? "border-accent2" : "border-accent"
+            }`}
+            aria-hidden
+          />
+          Lettura chat in corso...
+        </div>
+      )}
+
       {file && (
-        <section className="mt-12 border-t border-stone-200 pt-12">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500">
+        <section className="mt-12 border-t border-[var(--border)] pt-12">
+          <h2 className="font-ui text-xs font-semibold uppercase tracking-[0.2em] text-muted">
             2. Contesto
           </h2>
-          <p className="mt-2 max-w-xl text-sm text-stone-600">
-            Rispondi alle domande per contestualizzare l&apos;analisi. I dati sono
-            pensati per arricchire il report, non per identificarti.
+          <p className="font-ui mt-2 max-w-xl text-sm text-muted">
+            {isEnt
+              ? "Contesto e obiettivo guidano il report professionale: metriche oggettive, linguaggio orientato a decisioni e chiarezza."
+              : "Rispondi alle domande per contestualizzare l&apos;analisi. I dati sono pensati per arricchire il report, non per identificarti."}
           </p>
           <div className="mt-6 max-w-lg">
             <ContextForm
+              key={audienceSegment}
+              audienceSegment={audienceSegment}
               disabled={!file}
               isSubmitting={isSubmitting}
               onSubmit={handleAnalyze}
+              participants={participants}
+              chatMeta={chatMeta}
             />
           </div>
         </section>
@@ -135,7 +218,7 @@ export function UploadFlow() {
 
       {apiError && (
         <div
-          className="mt-8 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900"
+          className="font-ui mt-8 border border-[color-mix(in_oklab,var(--danger)_45%,var(--border))] bg-[var(--danger-bg)] px-4 py-3 text-sm text-foreground"
           role="alert"
         >
           {apiError}
