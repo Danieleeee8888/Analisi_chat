@@ -42,9 +42,12 @@ export interface UploadZoneProps {
   onFileChange: (file: File | null) => void;
   /** Durante invio API: non modificare il file. */
   disabled?: boolean;
+  /** Tema visivo allineato al percorso home (persone vs organizzazioni). */
+  variant?: "personal" | "enterprise";
 }
 
-export function UploadZone({ file, onFileChange, disabled }: UploadZoneProps) {
+export function UploadZone({ file, onFileChange, disabled, variant = "personal" }: UploadZoneProps) {
+  const isEnt = variant === "enterprise";
   const inputId = useId();
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -101,18 +104,25 @@ export function UploadZone({ file, onFileChange, disabled }: UploadZoneProps) {
           handleFile(dropped ?? null);
         }}
         className={[
-          "upload-zone flex flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-12 text-center sm:px-8 sm:py-[48px]",
+          "upload-zone flex flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-12 text-center transition-colors sm:px-8 sm:py-[48px]",
           disabled
             ? "cursor-not-allowed border-[var(--border)] bg-surface opacity-60"
-            : [
-                "cursor-pointer bg-surface",
-                isDragging
-                  ? "border-accent bg-accent-light"
-                  : "border-[var(--border)] hover:border-accent hover:bg-accent-light",
-              ].join(" "),
+            : isEnt
+              ? [
+                  "cursor-pointer bg-gradient-to-b from-teal-50/50 to-surface",
+                  isDragging
+                    ? "border-accent2 bg-accent2-light"
+                    : "border-teal-200/90 hover:border-accent2 hover:bg-teal-50/80",
+                ].join(" ")
+              : [
+                  "cursor-pointer bg-surface",
+                  isDragging
+                    ? "border-accent bg-accent-light"
+                    : "border-[var(--border)] hover:border-accent hover:bg-accent-light",
+                ].join(" "),
         ].join(" ")}
       >
-        <UploadGlyph className="mb-6 text-accent" />
+        <UploadGlyph className={["mb-6", isEnt ? "text-accent2" : "text-accent"].join(" ")} />
         <span className="font-ui text-base font-medium text-foreground">
           Trascina il file .zip
         </span>
@@ -148,7 +158,10 @@ export function UploadZone({ file, onFileChange, disabled }: UploadZoneProps) {
               setError(null);
               onFileChange(null);
             }}
-            className="nav-link mt-3 text-xs font-semibold text-accent-dark"
+            className={[
+              "nav-link mt-3 text-xs font-semibold",
+              isEnt ? "text-accent2" : "text-accent-dark",
+            ].join(" ")}
           >
             Rimuovi file
           </button>

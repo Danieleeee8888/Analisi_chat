@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import {
   AGE_BAND_OPTIONS,
@@ -27,9 +28,6 @@ export interface ContextFormProps {
   } | null;
 }
 
-const fieldClass =
-  "mt-1.5 w-full rounded-lg border border-[var(--border)] bg-white px-3 py-2 font-ui text-sm text-foreground shadow-sm placeholder:text-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25 disabled:opacity-50";
-
 function formatPeekDateFragment(raw: string | null): string {
   if (!raw) return "—";
   const s = raw.replace(/,\s*$/, "").trim();
@@ -49,6 +47,15 @@ export function ContextForm({
   const locked = Boolean(disabled || isSubmitting);
   const periodOpts = periodOptionsForSegment(audienceSegment);
   const relOpts = isEnt ? RELATIONSHIP_OPTIONS_ENTERPRISE : RELATIONSHIP_OPTIONS;
+
+  const fieldClass = [
+    "mt-1.5 w-full rounded-lg border bg-white px-3 py-2 font-ui text-sm text-foreground shadow-sm placeholder:text-muted focus:outline-none disabled:opacity-50",
+    isEnt
+      ? "border-teal-200/85 focus:border-accent2 focus:ring-2 focus:ring-accent2/25"
+      : "border-[var(--border)] focus:border-accent focus:ring-2 focus:ring-accent/25",
+  ].join(" ");
+
+  const radioAccentClass = isEnt ? "accent-teal-600" : "accent-indigo-500";
 
   const update = <K extends keyof ContextFormData>(key: K, value: ContextFormData[K]) => {
     setData((d) => ({ ...d, [key]: value }));
@@ -82,11 +89,45 @@ export function ContextForm({
   return (
     <>
       {isEnt && (
-        <p className="mb-6 rounded-xl border border-accent2/30 bg-accent2-light px-4 py-3 font-ui text-sm text-foreground">
-          <span className="font-semibold text-accent2">Percorso organizzazioni.</span> Stesse garanzie
-          privacy: export anonimizzato, nessun archivio della chat. Prezzi e finestre temporali sono
-          calibrati su team e stakeholder.
-        </p>
+        <div className="mb-6 rounded-2xl border border-teal-200/80 bg-gradient-to-br from-teal-50/90 to-white px-5 py-4 font-ui text-sm text-foreground shadow-sm">
+          <p className="font-semibold text-accent2">Contesto organizzativo</p>
+          <p className="mt-2 leading-relaxed text-muted">
+            Stesse garanzie del percorso privato: parsing in memoria, anonimizzazione prima dell’AI, zero
+            archivio testuale. Il report unisce{" "}
+            <span className="font-medium text-foreground">metriche osservabili</span> e{" "}
+            <span className="font-medium text-foreground">lettura di contesto, tono e temi</span> sul testo
+            anonimo — utile a decisioni e a preparazione professionale.
+          </p>
+          <p className="mt-3 rounded-lg border border-teal-200/60 bg-white/80 px-3 py-2 text-[13px] leading-snug text-muted">
+            <span className="font-medium text-foreground">Altri canali oltre WhatsApp?</span> Per team e
+            organizzazioni sono valutabili{" "}
+            <span className="font-medium text-foreground">piani personalizzati</span> (es. Slack, Teams,
+            export da altre piattaforme).{" "}
+            <Link href="/contatti" className="font-semibold text-accent2 underline-offset-2 hover:underline">
+              Scrivici in contatti
+            </Link>{" "}
+            per strutturare il flusso.
+          </p>
+          <ul className="mt-3 list-disc space-y-1 pl-4 text-[13px] leading-snug text-muted">
+            <li>
+              Terapeuti, psicologi, counselor: sintesi strutturale per supervisione — non sostituto
+              clinico.
+            </li>
+            <li>Manager e capiufficio: ritmo con molti collaboratori, rischio di essere letti come “freddi”.</li>
+            <li>Sales / account / HR: handoff, escalation, carico asincrono nel thread.</li>
+            <li>Brainstorm e progetti: riordino di temi e turni dopo chat lunghe.</li>
+          </ul>
+        </div>
+      )}
+
+      {!isEnt && (
+        <div className="mb-6 rounded-2xl border border-violet-200/80 bg-gradient-to-br from-violet-50/80 to-white px-5 py-4 font-ui text-sm shadow-sm">
+          <p className="font-semibold text-accent">Contesto personale</p>
+          <p className="mt-2 leading-relaxed text-muted">
+            Coppie, nuove conoscenze, famiglia, amici. Il campo libero può indicare cosa vuoi chiarire
+            (es. dopo un periodo difficile): il modello incrocia numeri e linguaggio sul testo anonimo.
+          </p>
+        </div>
       )}
 
       {chatMeta && (
@@ -123,6 +164,11 @@ export function ContextForm({
               </option>
             ))}
           </select>
+          <p className="mt-2 font-ui text-[12px] leading-snug text-[var(--text-secondary)]">
+            {isEnt
+              ? "Usato per calibrare lessico e sezioni del report (B2B, team, trattativa)."
+              : "Allinea le sezioni del report al tipo di legame (es. coppia vs nuova conoscenza)."}
+          </p>
         </div>
 
         <div>
@@ -146,7 +192,9 @@ export function ContextForm({
                       ? isEnt
                         ? "border-accent2 bg-accent2 text-white"
                         : "border-accent bg-accent text-white"
-                      : "border-[var(--border)] bg-surface text-muted hover:border-accent hover:text-accent"
+                      : isEnt
+                        ? "border-[var(--border)] bg-surface text-muted hover:border-accent2 hover:text-accent2"
+                        : "border-[var(--border)] bg-surface text-muted hover:border-accent hover:text-accent"
                   }`}
                 >
                   {name}
@@ -169,7 +217,7 @@ export function ContextForm({
             disabled={locked}
           />
           <p className="mt-1.5 font-ui text-[11px] text-[var(--text-secondary)]">
-            Il nome verrà anonimizzato prima dell&apos;analisi AI
+            Il nome verrà anonimizzato prima dell’analisi AI
           </p>
         </div>
 
@@ -208,7 +256,7 @@ export function ContextForm({
               <input
                 type="radio"
                 name="liveTogether"
-                className="accent-[var(--accent)]"
+                className={radioAccentClass}
                 checked={data.liveOrWorkTogether === "si"}
                 onChange={() => update("liveOrWorkTogether", "si")}
               />
@@ -218,7 +266,7 @@ export function ContextForm({
               <input
                 type="radio"
                 name="liveTogether"
-                className="accent-[var(--accent)]"
+                className={radioAccentClass}
                 checked={data.liveOrWorkTogether === "no"}
                 onChange={() => update("liveOrWorkTogether", "no")}
               />
@@ -232,7 +280,7 @@ export function ContextForm({
             5.{" "}
             {isEnt
               ? "Fascia d’età prevalente del gruppo (o preferisci non indicare)"
-              : "Età tua e dell&apos;altra persona (fascia)"}
+              : "Età tua e dell’altra persona (fascia)"}
           </label>
           <select
             id="ageBand"
@@ -255,7 +303,7 @@ export function ContextForm({
             6.{" "}
             {isEnt
               ? "Obiettivo analitico o ipotesi da verificare (opzionale)"
-              : "C&apos;è qualcosa di specifico che vuoi capire?"}{" "}
+              : "C’è qualcosa di specifico che vuoi capire?"}{" "}
             <span className="font-normal text-muted">(opzionale)</span>
           </label>
           <textarea
@@ -278,7 +326,7 @@ export function ContextForm({
           <p className="mt-0.5 font-ui text-[12px] text-[var(--text-secondary)]">
             {isEnt
               ? "Finestra temporale e profondità del report — listino dedicato organizzazioni"
-              : "Influisce sul prezzo e sulla profondità dell'analisi"}
+              : "Influisce sul prezzo e sulla profondità dell’analisi"}
           </p>
           <div className="mt-3 flex w-full flex-col gap-3">
             {periodOpts.map((opt) => {
@@ -300,27 +348,26 @@ export function ContextForm({
                   disabled={locked}
                   aria-pressed={selected}
                   aria-label={label}
-                  className={`relative w-full rounded-xl border-2 p-4 text-left transition-all ${
+                  className={`w-full rounded-xl border-2 p-4 text-left transition-all ${
                     selected ? periodAccentSelected : `border-[var(--border)] bg-white ${periodAccentHover}`
                   }`}
                 >
-                  {opt.badge && (
-                    <span
-                      className={`absolute top-3 right-3 rounded-full px-2 py-0.5 text-xs font-semibold ${badgeClass}`}
-                    >
-                      {opt.badge}
-                    </span>
-                  )}
-
-                  <div className="flex items-start justify-between gap-2 pr-16 sm:pr-20">
-                    <div>
-                      <p className="font-ui text-sm font-semibold text-foreground">{opt.label}</p>
-                      <p className="mt-0.5 font-ui text-xs leading-relaxed text-muted">
-                        {opt.sublabel}
-                      </p>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2 gap-y-1.5">
+                        <p className="font-ui text-sm font-semibold text-foreground">{opt.label}</p>
+                        {opt.badge ? (
+                          <span
+                            className={`inline-flex max-w-full rounded-full px-2.5 py-0.5 text-[11px] font-semibold leading-tight ${badgeClass}`}
+                          >
+                            {opt.badge}
+                          </span>
+                        ) : null}
+                      </div>
+                      <p className="mt-1.5 font-ui text-xs leading-relaxed text-muted">{opt.sublabel}</p>
                     </div>
                     <p
-                      className={`shrink-0 font-mono text-lg font-bold ${
+                      className={`shrink-0 font-mono text-lg font-bold tabular-nums sm:pt-0.5 sm:text-right ${
                         selected ? periodPriceSelected : "text-foreground"
                       }`}
                     >
@@ -342,7 +389,7 @@ export function ContextForm({
         </button>
         {!canSubmit && !locked && (
           <p className="font-ui text-xs text-muted">
-            Compila i campi obbligatori (2, 3 e 5) per abilitare l&apos;analisi.
+            Compila i campi obbligatori (2, 3 e 5) per abilitare l’analisi.
           </p>
         )}
       </form>

@@ -75,9 +75,32 @@ section.home-strip-stats {
   }
 }
 
+.stats-strip .home-lift-card:hover {
+  box-shadow: 0 18px 48px rgba(255, 255, 255, 0.07);
+}
+
 section.home-trust-badges {
   padding-top: 32px;
   padding-bottom: 32px;
+}
+
+/* Pagina upload — tema persone vs organizzazioni */
+.upload-hero--personal .upload-hero-gradient {
+  background:
+    linear-gradient(125deg, rgba(99, 102, 241, 0.12) 0%, rgba(255, 255, 255, 0.97) 45%, transparent 70%),
+    linear-gradient(220deg, rgba(249, 115, 22, 0.08) 0%, transparent 50%),
+    #ffffff;
+}
+
+.upload-hero--ent .upload-hero-gradient {
+  background:
+    linear-gradient(125deg, rgba(13, 148, 136, 0.14) 0%, rgba(255, 255, 255, 0.96) 48%, transparent 72%),
+    linear-gradient(210deg, rgba(99, 102, 241, 0.06) 0%, transparent 48%),
+    linear-gradient(180deg, #f8fafb 0%, #ffffff 100%);
+}
+
+.upload-page-root--enterprise .upload-hero-orbit {
+  box-shadow: 0 20px 50px rgba(13, 148, 136, 0.12);
 }
 
 @media (max-width: 768px) {
@@ -144,6 +167,199 @@ body {
 
 .hero-fade-up {
   animation: fadeUpHero 0.6s ease-out both;
+}
+
+/* Hero — titolo parola per parola */
+@keyframes hero-word-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.4em);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-word {
+  display: inline-block;
+  margin-right: 0.28em;
+  animation: hero-word-in 0.5s ease-out both;
+}
+
+.hero-word:last-child {
+  margin-right: 0;
+}
+
+/* Hero — sfondo gradient lentissimo */
+@keyframes hero-slow-gradient {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.hero-bg-animated {
+  background: linear-gradient(
+    125deg,
+    rgba(99, 102, 241, 0.16) 0%,
+    rgba(255, 255, 255, 0.92) 28%,
+    rgba(249, 115, 22, 0.1) 52%,
+    rgba(13, 148, 136, 0.09) 72%,
+    rgba(167, 139, 250, 0.12) 100%
+  );
+  background-size: 280% 280%;
+  animation: hero-slow-gradient 32s ease-in-out infinite;
+}
+
+/* CTA — glow morbido hover */
+.cta-glow-primary {
+  transition:
+    box-shadow 0.35s ease,
+    transform 0.2s ease;
+}
+.cta-glow-primary:hover {
+  box-shadow:
+    0 0 0 1px rgba(99, 102, 241, 0.2),
+    0 0 32px rgba(99, 102, 241, 0.35),
+    0 12px 40px rgba(99, 102, 241, 0.2);
+}
+
+.cta-glow-secondary {
+  transition:
+    box-shadow 0.35s ease,
+    transform 0.2s ease;
+}
+.cta-glow-secondary:hover {
+  box-shadow:
+    0 0 0 1px rgba(99, 102, 241, 0.15),
+    0 0 24px rgba(99, 102, 241, 0.18);
+}
+
+/* Hero card — pulse su label pattern */
+@keyframes hero-pattern-label-pulse {
+  0%,
+  100% {
+    opacity: 0.88;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+.hero-pattern-pulse {
+  animation: hero-pattern-label-pulse 2.8s ease-in-out infinite;
+}
+
+/* Sezione — scroll reveal */
+.section-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.section-reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Pattern — cursore terminale */
+@keyframes pattern-cursor-blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.pattern-type-cursor::after {
+  content: "▍";
+  margin-left: 2px;
+  animation: pattern-cursor-blink 1s step-end infinite;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 300;
+}
+
+/* Sicurezza — pulse warning */
+@keyframes warning-border-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.12);
+  }
+}
+
+.security-warning-block {
+  animation: warning-border-pulse 3s ease-in-out infinite;
+}
+
+/* Card — lift globale (homepage) */
+.home-lift-card {
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+.home-lift-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Persone / Org — glow hover */
+.home-card-person:hover {
+  box-shadow:
+    0 16px 44px rgba(99, 102, 241, 0.18),
+    0 0 0 1px rgba(99, 102, 241, 0.12);
+}
+
+.home-card-org:hover {
+  box-shadow:
+    0 16px 44px rgba(13, 148, 136, 0.2),
+    0 0 0 1px rgba(13, 148, 136, 0.15);
+}
+
+/* Click micro zoom */
+.home-card-tap:active {
+  transform: scale(1.02);
+  transition: transform 0.12s ease;
+}
+
+/* Come funziona — linea progresso */
+.howit-track {
+  position: relative;
+}
+.howit-connector-svg {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 152px;
+  height: 6px;
+  pointer-events: none;
+  z-index: 0;
+  display: none;
+}
+@media (min-width: 768px) {
+  .howit-connector-svg {
+    display: block;
+  }
+}
+.howit-connector-path {
+  stroke: url(#howitConnectorGrad);
+  stroke-width: 3;
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.12s linear;
 }
 
 .hero-h1 {
@@ -370,7 +586,7 @@ body {
   animation: hero-make-spark 2.4s ease-in-out infinite;
 }
 
-/* Scroll reveal — card */
+/* Come funziona — card reveal */
 .card-reveal {
   opacity: 0;
   transform: translateY(32px);

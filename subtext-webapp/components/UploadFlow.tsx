@@ -138,92 +138,242 @@ export function UploadFlow({
   };
 
   return (
-    <>
-      <p className="font-ui text-sm text-muted">
-        <Link href="/" className="nav-link text-muted hover:text-foreground">
-          ← Home
-        </Link>
-      </p>
-      <h1 className="font-display mt-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-        {isEnt ? "Carica la conversazione da analizzare" : "Carica la tua chat"}
-      </h1>
-      <p className="font-ui mt-3 max-w-xl leading-relaxed text-muted">
-        {isEnt ? (
-          <>
-            Export WhatsApp (.zip) di canali con clienti, fornitori o team. Stesso trattamento
-            sicuro: parsing in memoria, anonimizzazione prima dell&apos;AI, listino e contesto
-            modulati per organizzazioni.
-          </>
-        ) : (
-          <>
-            Esporta la conversazione da WhatsApp come file .zip (senza media se vuoi ridurre le
-            dimensioni). L&apos;elaborazione avviene sul server in memoria: nessun salvataggio
-            persistente della chat lato applicazione, come da policy in evoluzione.
-          </>
-        )}
-      </p>
-
-      <section className="mt-10">
-        <h2 className="font-ui text-xs font-semibold uppercase tracking-[0.2em] text-muted">
-          1. File
-        </h2>
-        <div className="mt-4">
-          <UploadZone
-            file={file}
-            onFileChange={setFile}
-            disabled={isSubmitting}
-          />
-        </div>
-      </section>
-
-      {file && isPeeking && (
+    <div
+      className={[
+        "upload-page-root flex min-h-0 flex-1 flex-col",
+        isEnt ? "upload-page-root--enterprise" : "upload-page-root--personal",
+      ].join(" ")}
+    >
+      <div
+        className={[
+          "relative overflow-hidden border-b border-[var(--border)]",
+          isEnt ? "upload-hero--ent" : "upload-hero--personal",
+        ].join(" ")}
+      >
+        <div className="pointer-events-none absolute inset-0 upload-hero-gradient" aria-hidden />
         <div
-          className="font-ui mt-6 flex items-center gap-2 py-4 text-sm text-muted"
-          role="status"
-          aria-live="polite"
-        >
-          <div
-            className={`h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-t-transparent ${
-              isEnt ? "border-accent2" : "border-accent"
-            }`}
-            aria-hidden
-          />
-          Lettura chat in corso...
-        </div>
-      )}
+          className={[
+            "pointer-events-none absolute -right-16 top-0 h-64 w-64 rounded-full blur-3xl",
+            isEnt ? "bg-teal-400/20" : "bg-violet-400/25",
+          ].join(" ")}
+          aria-hidden
+        />
+        <div
+          className={[
+            "pointer-events-none absolute -left-20 bottom-0 h-56 w-56 rounded-full blur-3xl",
+            isEnt ? "bg-amber-300/15" : "bg-amber-300/20",
+          ].join(" ")}
+          aria-hidden
+        />
 
-      {file && (
-        <section className="mt-12 border-t border-[var(--border)] pt-12">
-          <h2 className="font-ui text-xs font-semibold uppercase tracking-[0.2em] text-muted">
-            2. Contesto
-          </h2>
-          <p className="font-ui mt-2 max-w-xl text-sm text-muted">
-            {isEnt
-              ? "Contesto e obiettivo guidano il report professionale: metriche oggettive, linguaggio orientato a decisioni e chiarezza."
-              : "Rispondi alle domande per contestualizzare l&apos;analisi. I dati sono pensati per arricchire il report, non per identificarti."}
+        <div className="relative mx-auto max-w-[1100px] px-4 py-12 sm:px-6 sm:py-16">
+          <p className="font-ui text-sm">
+            <Link href="/" className="nav-link text-muted hover:text-foreground">
+              ← Home
+            </Link>
+            <span className="mx-2 text-[var(--border)]">/</span>
+            <Link
+              href={isEnt ? "/upload?audience=aziende" : "/upload"}
+              className="font-medium text-foreground"
+            >
+              Caricamento
+            </Link>
           </p>
-          <div className="mt-6 max-w-lg">
-            <ContextForm
-              key={audienceSegment}
-              audienceSegment={audienceSegment}
-              disabled={!file}
-              isSubmitting={isSubmitting}
-              onSubmit={handleAnalyze}
-              participants={participants}
-              chatMeta={chatMeta}
+
+          <div className="mt-8 grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_200px]">
+            <div className="min-w-0">
+              <span
+                className={[
+                  "inline-flex rounded-full px-3 py-1 font-ui text-[11px] font-bold uppercase tracking-widest",
+                  isEnt
+                    ? "bg-teal-100 text-teal-900 ring-1 ring-teal-200/80"
+                    : "bg-violet-100 text-violet-900 ring-1 ring-violet-200/80",
+                ].join(" ")}
+              >
+                {isEnt ? "Subtext · organizzazioni" : "Subtext · persone"}
+              </span>
+              <h1 className="font-display mt-5 text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-[2.5rem] lg:leading-tight">
+                {isEnt
+                  ? "Da export a insight operativo, senza archiviare il dialogo"
+                  : "Carica la conversazione. Estrai la struttura, non solo i messaggi."}
+              </h1>
+              <p className="font-ui mt-4 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
+                {isEnt ? (
+                  <>
+                    Team, clienti, fornitori, workshop — e professionisti che usano export anonimi per
+                    preparare colloqui: stesso flusso sicuro, report con metriche e sintesi tematica.
+                    Listino dedicato; per <span className="font-medium text-foreground">altri canali</span>{" "}
+                    (Slack, Teams, formati su misura){" "}
+                    <Link href="/contatti" className="font-semibold text-accent2 underline-offset-2 hover:underline">
+                      contattaci
+                    </Link>{" "}
+                    per <span className="font-medium text-foreground">piani personalizzati</span>.
+                  </>
+                ) : (
+                  <>
+                    File .zip da WhatsApp (anche senza media). Pre-analisi gratuita in locale; report
+                    completo che unisce ritmi misurabili e lettura di temi e toni sul testo già
+                    anonimizzato.
+                  </>
+                )}
+              </p>
+              <ul className="font-ui mt-6 flex flex-wrap gap-x-5 gap-y-2 text-[12px] font-medium text-[var(--text-secondary)]">
+                <li className="flex items-center gap-2">
+                  <span
+                    className={[
+                      "h-1.5 w-1.5 rounded-full",
+                      isEnt ? "bg-accent2" : "bg-accent",
+                    ].join(" ")}
+                    aria-hidden
+                  />
+                  Nessun archivio della chat
+                </li>
+                <li className="flex items-center gap-2">
+                  <span
+                    className={[
+                      "h-1.5 w-1.5 rounded-full",
+                      isEnt ? "bg-accent2" : "bg-accent",
+                    ].join(" ")}
+                    aria-hidden
+                  />
+                  Anonimizzazione pre-AI
+                </li>
+                <li className="flex items-center gap-2">
+                  <span
+                    className={[
+                      "h-1.5 w-1.5 rounded-full",
+                      isEnt ? "bg-accent2" : "bg-accent",
+                    ].join(" ")}
+                    aria-hidden
+                  />
+                  Pre-analisi gratuita
+                </li>
+              </ul>
+            </div>
+
+            <div
+              className={[
+                "upload-hero-orbit hidden rounded-2xl border p-6 shadow-sm lg:flex lg:flex-col lg:items-center lg:justify-center",
+                isEnt
+                  ? "border-teal-200/80 bg-gradient-to-br from-teal-50/90 to-white"
+                  : "border-violet-200/80 bg-gradient-to-br from-violet-50/90 to-white",
+              ].join(" ")}
+              aria-hidden
+            >
+              <div
+                className={[
+                  "flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-md",
+                  isEnt ? "bg-accent2" : "bg-accent",
+                ].join(" ")}
+              >
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
+                  <path
+                    d="M12 4v11m0 0 4-4m-4 4-4-4M5 18h14"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+              <p className="font-ui mt-4 text-center text-[11px] font-semibold uppercase tracking-widest text-muted">
+                Step 1
+              </p>
+              <p className="font-display mt-1 text-center text-sm font-bold text-foreground">
+                .zip WhatsApp
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-10 sm:max-w-3xl sm:px-6 sm:py-14">
+        <section>
+          <div className="flex items-end justify-between gap-4">
+            <h2
+              className={[
+                "font-ui text-xs font-semibold uppercase tracking-[0.2em]",
+                isEnt ? "text-accent2" : "text-accent",
+              ].join(" ")}
+            >
+              1. File
+            </h2>
+            <Link
+              href="/metodo"
+              className="font-ui hidden text-xs font-medium text-muted underline-offset-4 hover:text-foreground hover:underline sm:inline"
+            >
+              Perché misuriamo il testo →
+            </Link>
+          </div>
+          <div className="mt-4">
+            <UploadZone
+              file={file}
+              onFileChange={setFile}
+              disabled={isSubmitting}
+              variant={isEnt ? "enterprise" : "personal"}
             />
           </div>
         </section>
-      )}
 
-      {apiError && (
-        <div
-          className="font-ui mt-8 border border-[color-mix(in_oklab,var(--danger)_45%,var(--border))] bg-[var(--danger-bg)] px-4 py-3 text-sm text-foreground"
-          role="alert"
-        >
-          {apiError}
-        </div>
-      )}
-    </>
+        {file && isPeeking && (
+          <div
+            className="font-ui mt-6 flex items-center gap-2 py-4 text-sm text-muted"
+            role="status"
+            aria-live="polite"
+          >
+            <div
+              className={`h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-t-transparent ${
+                isEnt ? "border-accent2" : "border-accent"
+              }`}
+              aria-hidden
+            />
+            Lettura chat in corso...
+          </div>
+        )}
+
+        {file && (
+          <section
+            className={[
+              "mt-12 border-t pt-12",
+              isEnt ? "border-teal-200/50" : "border-[var(--border)]",
+            ].join(" ")}
+          >
+            <h2
+              className={[
+                "font-ui text-xs font-semibold uppercase tracking-[0.2em]",
+                isEnt ? "text-accent2" : "text-accent",
+              ].join(" ")}
+            >
+              2. Contesto
+            </h2>
+            <p className="font-ui mt-2 max-w-xl text-sm leading-relaxed text-muted">
+              {isEnt
+                ? "Ruolo, tipo di rapporto e obiettivo: il report resta su evidenza (timing + linguaggio) per decisioni o preparazione professionale — studio incluso."
+                : "Le risposte orientano il report su relazione, tempo e domande aperte: metriche e lettura del testo restano agganciate a ciò che ti interessa capire."}
+            </p>
+            <div className="mt-6 max-w-lg">
+              <ContextForm
+                key={audienceSegment}
+                audienceSegment={audienceSegment}
+                disabled={!file}
+                isSubmitting={isSubmitting}
+                onSubmit={handleAnalyze}
+                participants={participants}
+                chatMeta={chatMeta}
+              />
+            </div>
+          </section>
+        )}
+
+        {apiError && (
+          <div
+            className="font-ui mt-8 border border-[color-mix(in_oklab,var(--danger)_45%,var(--border))] bg-[var(--danger-bg)] px-4 py-3 text-sm text-foreground"
+            role="alert"
+          >
+            {apiError}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

@@ -1,10 +1,26 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
+import { audienceFromQueryParam } from "@/lib/context-form-types";
 import { UploadPageClient } from "./UploadPageClient";
 
-export const metadata = {
-  title: "Carica chat — Subtext",
-  description: "Carica l'export WhatsApp per l'analisi."
-};
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<Metadata> {
+  const sp = await searchParams;
+  const raw = sp.audience;
+  const param = typeof raw === "string" ? raw : Array.isArray(raw) ? raw[0] : null;
+  const isEnt = audienceFromQueryParam(param) === "enterprise";
+  return {
+    title: isEnt ? "Carica conversazione — Subtext Work" : "Carica chat — Subtext",
+    description: isEnt
+      ? "Upload anonimo per team, clienti e stakeholder. Export WhatsApp, contesto B2B."
+      : "Carica l'export WhatsApp per l'analisi strutturale della conversazione.",
+  };
+}
 
 function UploadFallback() {
   return (

@@ -5,9 +5,9 @@ import { useEffect, useRef, useState } from "react";
 
 const steps = [
   {
-    title: "Carica",
+    title: "Carica la conversazione",
     description:
-      "Esporti la conversazione da WhatsApp come .zip — anche senza media, se preferisci. Il file viene elaborato sul server secondo le regole del prodotto: messaggi in memoria per il calcolo, senza costruire un archivio personale della tua chat.",
+      "Export .zip da WhatsApp (anche senza media). Elaborazione in memoria: niente archivio della tua chat.",
     highlight: "Nessun dato salvato dopo l'analisi",
     Icon: StepIconUpload,
     accentClass: "text-accent3",
@@ -15,20 +15,20 @@ const steps = [
     visualClass: "bg-gradient-to-br from-[#fff7ed] to-[#fed7aa]",
   },
   {
-    title: "Leggi",
+    title: "Guarda cosa emerge",
     description:
-      "In pochi secondi ottieni una pre-analisi gratuita: chi scrive di più, chi riapre dopo una pausa, come si distribuiscono i messaggi nel tempo. Numeri prima delle parole — così puoi valutare con calma cosa ha senso approfondire.",
-    highlight: "Elaborazione locale + AI sicura",
+      "Pre-analisi gratuita: volumi, pause, chi riapre — poi il modello legge il testo anonimo per temi, toni e ripetizioni, non solo conteggi.",
+    highlight: "Elaborazione sicura + AI (Claude)",
     Icon: StepIconChart,
     accentClass: "text-accent",
     numColor: "#6366f1",
     visualClass: "bg-gradient-to-br from-[#eef2ff] to-[#c7d2fe]",
   },
   {
-    title: "Approfondisci",
+    title: "Capisci cosa significa",
     description:
-      "Il report completo (a pagamento) incrocia le metriche con un testo chiaro, generato con Claude di Anthropic sul dato già anonimizzato. Pattern, ritmi e ripetizioni diventano un documento che puoi rileggere e condividere come preferisci.",
-    highlight: "PDF scaricabile, tuo per sempre",
+      "Report completo: metriche incrociate con lettura linguistica — argomenti ricorrenti, sfumature di tono, contesto. PDF che tieni tu.",
+    highlight: "PDF scaricabile",
     Icon: StepIconReport,
     accentClass: "text-accent2",
     numColor: "#0d9488",
@@ -172,7 +172,7 @@ function HeroAnimatedVisual() {
             </div>
           </div>
 
-          <p className="font-ui mt-4 text-center text-[11px] font-semibold uppercase tracking-widest text-violet-600/90">
+          <p className="font-ui hero-pattern-pulse mt-4 text-center text-[11px] font-semibold uppercase tracking-widest text-violet-600/90">
             Pattern estratti dal testo
           </p>
 
@@ -235,85 +235,204 @@ function HeroAnimatedVisual() {
 const useCasesPersonal = [
   {
     emoji: "💬",
-    title: "State ancora davvero comunicando?",
-    body:
-      "Dopo anni insieme è facile perdere il filo. Subtext mostra chi ha smesso di fare domande, chi risponde sempre tardi, chi ha cambiato tono negli ultimi mesi — e quali argomenti accendono ancora la conversazione. Non per giudicare, per capire.",
+    title: "State parlando. O vi state perdendo?",
+    body: "Ritmo e reciprocità, ma anche temi che spariscono e registri di tono: numeri e linguaggio insieme.",
     tag: "Coppia",
     tagClass: "bg-accent-light text-accent",
   },
   {
     emoji: "🔍",
-    title: "È davvero interessato a te?",
-    body:
-      "Quando si conosce qualcuno di nuovo è difficile leggere i segnali. La frequenza, la lunghezza dei messaggi, chi riprende sempre la conversazione e su quali temi l'altro si accende di più — tutto questo racconta un interesse reale o una cortesia di facciata.",
+    title: "Interesse reale. O solo abitudine?",
+    body: "Frequenze e lunghezze, più lettura di come si parla quando c’è (o non c’è) coinvolgimento.",
     tag: "Nuove conoscenze",
     tagClass: "bg-accent3-light text-accent3-dark",
   },
   {
-    emoji: "🌍",
-    title: "La distanza si sente anche nei messaggi.",
-    body:
-      "Le coppie lontane comunicano quasi solo per testo. Subtext analizza se il ritmo di contatto è cambiato nel tempo, se le conversazioni si accorciano, se uno dei due porta sempre il peso di ricominciare — e se certi argomenti sono spariti dal vostro vocabolario.",
-    tag: "Long distance",
+    emoji: "🏠",
+    title: "Famiglia: chi tiene il filo, chi sparisce.",
+    body: "Gruppi e sottogruppi impliciti: chi media, chi resta ai margini — struttura oltre le battute.",
+    tag: "Famiglia",
     tagClass: "bg-accent-light text-accent",
+  },
+  {
+    emoji: "🫂",
+    title: "Amici e gruppi: rumore e gerarchie.",
+    body: "Chi monopolizza il turno, dove le idee si perdono, quali argomenti tornano sempre.",
+    tag: "Amici / gruppo",
+    tagClass: "bg-accent3-light text-accent3-dark",
   },
   {
     emoji: "🛡️",
     title: "Quando qualcosa non torna.",
-    body:
-      "Subtext rileva pattern oggettivi che possono indicare squilibri: richieste di localizzazione ripetute, isolamento progressivo da amici e famiglia, cicli ravvicinati di tensione e riconciliazione. Non diagnostica — segnala. Con rispetto e senza allarmismi. Per i casi più seri indica risorse concrete come il Numero Verde 1522.",
+    body: "Pattern oggettivi (controllo, isolamento, cicli tensione/perdono). Non diagnostica: segnala.",
     tag: "Sicurezza",
     tagClass: "bg-[#fef2f2] text-[#dc2626]",
   },
   {
     emoji: "🧠",
-    title: "Come comunichi tu, in ogni relazione?",
-    body:
-      "Carica più chat diverse — coppia, amici, lavoro — e scopri il tuo stile comunicativo trasversale. Sei chi fa domande o chi risponde? Chi riapre i silenzi o chi li lascia cadere? Quali temi porti sempre tu e quali eviti? La consapevolezza è il primo passo per migliorare.",
-    tag: "Self-awareness",
+    title: "Profilo Pro (roadmap)",
+    body: "Stessa persona, chat diverse: impronta comunicativa trasversale — da roadmap prodotto, in arrivo.",
+    tag: "Pro",
     tagClass: "bg-accent2-light text-accent2",
   },
 ] as const;
 
 const useCasesEnterprise = [
   {
+    emoji: "🧑‍⚕️",
+    title: "Studio e supervisione: meno scrolling, più struttura",
+    body: "Terapeuti, psicologi, counselor: sintesi di contesto, tono e temi su export anonimo — supporto al colloquio, non sostituto clinico.",
+    tag: "Clinica & counseling",
+    tagClass: "bg-[#eef2ff] text-accent",
+  },
+  {
     emoji: "🤝",
-    title: "Qualità reale del rapporto con clienti e partner",
-    body:
-      "Tempi di risposta, lunghezza dei messaggi, chi traina le trattative e dove si interrompe il flusso: segnali comportamentali utili a sales, customer success e consulenti — senza interpretazioni da tisaniera.",
+    title: "Clienti e partner: cosa succede nel thread",
+    body: "Metriche più lettura del linguaggio (urgenza, deferenza, chiusure): sales e account con evidenza mista.",
     tag: "Sales & account",
     tagClass: "bg-accent2-light text-accent2",
   },
   {
     emoji: "⚙️",
-    title: "Team asincroni: chi porta il carico invisibile?",
-    body:
-      "Nei canali di progetto emergono monopolisti del thread, silenzi prolungati dopo le decisioni, escalation implicite. Dati per 1:1 più onesti e per ridisegnare responsabilità.",
+    title: "Team async: chi tira il carico",
+    body: "Monologhi, silenzi dopo le decisioni, escalation implicita — quantificato e contestualizzato nel testo.",
     tag: "People & team",
     tagClass: "bg-[#eef2ff] text-accent",
   },
   {
     emoji: "📋",
-    title: "Leadership: feedback tra righe",
-    body:
-      "Manager e HR possono usare export anonimizzati per preparare colloqui, debrief post-progetto o momenti di coaching — sempre con metriche osservabili, mai con gossip.",
+    title: "HR e leadership: debrief difendibili",
+    body: "Export anonimi con metriche e sintesi tematica per colloqui e retro, senza gossip.",
     tag: "HR / Leadership",
     tagClass: "bg-[#f0fdf4] text-[#15803d]",
   },
   {
+    emoji: "💡",
+    title: "Brainstorm e progetti",
+    body: "Dopo chat lunghe: temi ricorrenti, chi non entra nel turno, idee che non atterrano mai.",
+    tag: "Workshop",
+    tagClass: "bg-accent3-light text-accent3-dark",
+  },
+  {
     emoji: "🔐",
-    title: "Workflow sobrio e difendibile",
-    body:
-      "Niente training sui vostri messaggi, niente archivio a fine analisi: adatto a contesti in cui privacy e reputazione contano quanto l’insight.",
+    title: "Privacy che regge il confronto",
+    body: "Niente training sui vostri messaggi, niente archivio dopo l’analisi.",
     tag: "Compliance-ready",
     tagClass: "bg-surface text-foreground ring-1 ring-[var(--border)]",
   },
 ] as const;
 
+const HERO_TITLE_WORDS = [
+  "Il",
+  "sottotesto",
+  "non",
+  "si",
+  "scorre.",
+  "Si",
+  "estrae",
+  "con",
+  "metodo.",
+] as const;
+
+const PATTERN_TYPING_LINES = [
+  "Turn-taking e latenze: chi governa l’apertura dei turni, chi li chiude in fretta, chi lascia cadere.",
+  "Attraversamento delle frizioni — o deviazioni: dove il testo cambia registro prima che il tema sia risolto.",
+  "Reciprocità misurabile: quanto del carico conversazionale resta su una sola parte della coppia.",
+] as const;
+
+function PatternIndigoSection({
+  sectionRef,
+  parallaxY,
+}: {
+  sectionRef: React.RefObject<HTMLElement | null>;
+  parallaxY: number;
+}) {
+  const lines = PATTERN_TYPING_LINES;
+  const [started, setStarted] = useState(false);
+  const [completed, setCompleted] = useState<string[]>([]);
+  const [lineIdx, setLineIdx] = useState(0);
+  const [col, setCol] = useState(0);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) setStarted(true);
+      },
+      { threshold: 0.12 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [sectionRef]);
+
+  useEffect(() => {
+    if (!started) return;
+    if (lineIdx >= lines.length) return;
+    const full = lines[lineIdx];
+    if (col < full.length) {
+      const ch = full[col];
+      const delay =
+        ch === "." ? 320 : ch === "," ? 220 : ch === " " ? 42 : 28 + Math.floor(Math.random() * 44);
+      const t = setTimeout(() => setCol((c) => c + 1), delay);
+      return () => clearTimeout(t);
+    }
+    const t = setTimeout(() => {
+      setCompleted((d) => [...d, full]);
+      setLineIdx((i) => i + 1);
+      setCol(0);
+    }, 480);
+    return () => clearTimeout(t);
+  }, [started, lineIdx, col, lines]);
+
+  const taglineDone = lineIdx >= lines.length;
+  const currentFull = lineIdx < lines.length ? lines[lineIdx] : "";
+  const partial = currentFull.slice(0, col);
+
+  return (
+    <section ref={sectionRef} className="section-indigo bg-accent">
+      <div
+        className="will-change-transform"
+        style={{ transform: `translateY(${parallaxY}px)` }}
+      >
+        <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
+          <div className="mono min-h-[168px] max-w-3xl space-y-3 text-[15px] leading-relaxed text-white/95 sm:min-h-[180px] sm:text-[17px]">
+            {completed.map((l, i) => (
+              <p key={`${l}-${i}`} className="border-l-2 border-white/30 pl-4">
+                {l}
+              </p>
+            ))}
+            {started && lineIdx < lines.length ? (
+              <p className="pattern-type-cursor border-l-2 border-white/45 pl-4">{partial}</p>
+            ) : null}
+          </div>
+          {taglineDone ? (
+            <div className="hero-fade-up">
+              <p className="font-display mt-10 text-2xl font-bold leading-snug text-white sm:text-3xl">
+                Non è intuizione. È struttura che regge il confronto con i dati.
+              </p>
+              <div className="mt-8">
+                <Link
+                  href="/upload"
+                  className="font-ui cta-glow-primary inline-flex items-center justify-center rounded-lg bg-white px-6 py-3.5 text-sm font-bold text-accent shadow-md"
+                >
+                  Scopri i tuoi pattern
+                </Link>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   const [indigoParallaxPx, setIndigoParallaxPx] = useState(0);
   const [reportDate, setReportDate] = useState("");
+  const [howItProgress, setHowItProgress] = useState(0);
   const comeFunzionaRef = useRef<HTMLUListElement>(null);
+  const howItSectionRef = useRef<HTMLElement>(null);
   const statsRef = useRef<HTMLElement>(null);
   const reportMockRef = useRef<HTMLDivElement>(null);
   const indigoRef = useRef<HTMLElement>(null);
@@ -404,16 +523,50 @@ export default function Home() {
     };
   }, []);
 
+  useEffect(() => {
+    const section = howItSectionRef.current;
+    if (!section) return;
+    const onScroll = () => {
+      const r = section.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const span = vh + r.height;
+      const raw = (vh * 0.55 - r.top) / span;
+      setHowItProgress(Math.max(0, Math.min(1, raw)));
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    onScroll();
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    const els = document.querySelectorAll<HTMLElement>(".section-reveal");
+    if (!els.length) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) e.target.classList.add("visible");
+        }
+      },
+      { threshold: 0.07, rootMargin: "0px 0px -6% 0px" },
+    );
+    for (const el of els) io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <div className="flex flex-1 flex-col">
       <section className="relative overflow-hidden border-b border-[var(--border)]">
+        <div className="hero-bg-animated pointer-events-none absolute inset-0" aria-hidden />
         <div
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(99,102,241,0.14)_0%,transparent_42%),linear-gradient(225deg,rgba(249,115,22,0.11)_0%,transparent_45%),linear-gradient(180deg,rgba(13,148,136,0.08)_0%,transparent_55%),linear-gradient(90deg,rgba(253,230,138,0.15)_0%,transparent_35%)]"
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.65)_0%,transparent_55%)]"
           aria-hidden
         />
-        <div className="pointer-events-none absolute -left-24 top-20 h-72 w-72 rounded-full bg-violet-400/20 blur-3xl" aria-hidden />
-        <div className="pointer-events-none absolute -right-16 bottom-0 h-80 w-80 rounded-full bg-amber-300/25 blur-3xl" aria-hidden />
-        <div className="pointer-events-none absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-teal-400/15 blur-3xl" aria-hidden />
+        <div className="pointer-events-none absolute -left-24 top-20 h-72 w-72 rounded-full bg-violet-400/18 blur-3xl" aria-hidden />
+        <div className="pointer-events-none absolute -right-16 bottom-0 h-80 w-80 rounded-full bg-amber-300/22 blur-3xl" aria-hidden />
 
         <div className="relative mx-auto max-w-[1200px] px-4 pb-16 pt-14 sm:px-6 sm:pb-20 sm:pt-16">
           <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(280px,440px)] lg:gap-10 xl:gap-14">
@@ -422,40 +575,71 @@ export default function Home() {
                 className="hero-fade-up mb-5 inline-flex flex-wrap items-center gap-2 rounded-full border border-violet-200/80 bg-white/90 px-4 py-1.5 font-ui text-[11px] font-semibold uppercase tracking-[0.14em] shadow-sm backdrop-blur-sm sm:text-xs"
                 style={{ animationDelay: "0s" }}
               >
-                <span className="text-accent">Analisi</span>
+                <span className="text-accent">Pattern</span>
                 <span className="hidden text-[var(--text-secondary)] sm:inline">·</span>
-                <span className="text-[var(--text-secondary)]">metodo + AI (Claude)</span>
+                <span className="text-[var(--text-secondary)]">metodo + Claude</span>
               </p>
 
-              <div className="hero-title-wrap max-w-[36rem]">
-                <h1
-                  className="hero-fade-up hero-h1 font-display text-balance text-4xl font-bold leading-[1.08] tracking-tight text-foreground sm:text-5xl lg:text-[3.25rem]"
-                  style={{ animationDelay: "0.08s" }}
-                >
-                  Lettura professionale dei pattern nelle conversazioni digitali.
+              <div className="hero-title-wrap max-w-[38rem]">
+                <h1 className="hero-h1 font-display text-balance font-bold leading-[1.08] tracking-tight text-foreground">
+                  {HERO_TITLE_WORDS.map((w, i) => (
+                    <span
+                      key={`${w}-${i}`}
+                      className="hero-word"
+                      style={{ animationDelay: `${0.06 + i * 0.055}s` }}
+                    >
+                      {w}
+                    </span>
+                  ))}
                 </h1>
               </div>
 
               <p
-                className="hero-fade-up font-ui mt-5 max-w-xl text-pretty text-lg leading-relaxed text-[var(--text-secondary)] sm:text-xl"
-                style={{ animationDelay: "0.15s" }}
+                className="hero-fade-up font-ui mt-5 max-w-xl text-pretty text-lg leading-snug text-[var(--text-secondary)] sm:text-xl"
+                style={{ animationDelay: "0.2s" }}
               >
-                La vera svolta è il <strong className="font-semibold text-foreground">metodo</strong>{" "}
-                con cui trasformiamo migliaia di messaggi in{" "}
-                <strong className="font-semibold text-foreground">pattern e segnali</strong> che, a
-                colpo d&apos;occhio, passerebbero inosservati — ritmo, pause, squilibri, ripartenze.
-                Poi entra in gioco l&apos;
-                <strong className="font-semibold text-foreground">AI</strong> (Claude): dà voce ai
-                numeri e ti restituisce un report leggibile in pochi minuti. Niente fuffa: struttura
-                resa chiara, per privati e per team che vogliono decidere con dati, non con
-                sensazioni.
+                Metriche sul timing si incontrano con la lettura del linguaggio: temi che tornano,
+                sfumature di tono, contesto tra un messaggio e l&apos;altro. Non solo conteggi —
+                comprensione strutturata di come state comunicando.
               </p>
 
               <div
-                className="hero-fade-up hero-accent-bar mt-8 max-w-md"
-                style={{ animationDelay: "0.22s" }}
-                aria-hidden
-              />
+                className="hero-fade-up mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center"
+                style={{ animationDelay: "0.26s" }}
+              >
+                <Link
+                  href="/upload"
+                  className="cta-glow-primary font-ui inline-flex items-center justify-center rounded-xl bg-accent px-7 py-3.5 text-sm font-bold text-white shadow-lg transition hover:bg-accent-dark"
+                >
+                  Analizza la tua chat
+                </Link>
+                <Link
+                  href="#esempio-reale"
+                  className="cta-glow-secondary font-ui inline-flex items-center justify-center rounded-xl border-2 border-violet-200 bg-white/95 px-7 py-3.5 text-sm font-bold text-foreground shadow-sm transition hover:border-accent/40"
+                >
+                  Vedi un esempio reale
+                </Link>
+              </div>
+
+              <div
+                className="hero-fade-up mt-6 flex flex-wrap items-center gap-x-4 gap-y-2"
+                style={{ animationDelay: "0.32s" }}
+              >
+                <Link
+                  href="/#come-funziona"
+                  className="font-ui text-sm font-semibold text-foreground underline-offset-4 transition hover:underline"
+                >
+                  Come funziona
+                </Link>
+                <span className="text-[var(--text-secondary)]">·</span>
+                <span className="font-ui text-sm text-muted">
+                  Psicologi e studio: percorso{" "}
+                  <Link href="/upload?audience=aziende" className="font-semibold text-foreground underline-offset-2 hover:underline">
+                    organizzazioni
+                  </Link>
+                  .
+                </span>
+              </div>
             </div>
 
             <div
@@ -465,82 +649,38 @@ export default function Home() {
               <HeroAnimatedVisual />
             </div>
           </div>
-
-          <div
-            className="hero-fade-up mt-12 grid gap-5 md:grid-cols-2 md:gap-6 lg:mt-14"
-            style={{ animationDelay: "0.28s" }}
-          >
-            <Link
-              href="/upload"
-              className="group relative flex flex-col overflow-hidden rounded-2xl border-2 border-violet-200 bg-white p-7 shadow-[0_20px_50px_rgba(99,102,241,0.12)] transition hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_24px_60px_rgba(99,102,241,0.18)]"
-            >
-              <span className="font-ui text-[11px] font-bold uppercase tracking-widest text-violet-600">
-                Persone &amp; relazioni
-              </span>
-              <h2 className="font-display mt-3 text-2xl font-bold text-foreground sm:text-[26px]">
-                Coppie, amicizie, nuove conoscenze
-              </h2>
-              <p className="font-ui mt-3 flex-1 text-sm leading-relaxed text-muted">
-                Stessi strumenti che usano linguisti e ricercatori sul testo: ritmo, reciprocità,
-                silenzi. Pensato per chi vuole capire — non per chi cerca drama.
-              </p>
-              <span className="font-ui mt-6 inline-flex items-center gap-2 text-sm font-bold text-accent">
-                Inizia — pre-analisi gratuita
-                <span aria-hidden className="transition group-hover:translate-x-0.5">
-                  →
-                </span>
-              </span>
-              <span className="font-ui mt-2 text-xs text-muted">Report da 4,99€ · solo italiano</span>
-            </Link>
-
-            <Link
-              href="/upload?audience=aziende"
-              className="group relative flex flex-col overflow-hidden rounded-2xl border-2 border-teal-200 bg-gradient-to-br from-white to-teal-50/80 p-7 shadow-[0_20px_50px_rgba(13,148,136,0.1)] transition hover:-translate-y-0.5 hover:border-accent2 hover:shadow-[0_24px_60px_rgba(13,148,136,0.16)]"
-            >
-              <span className="font-ui text-[11px] font-bold uppercase tracking-widest text-accent2">
-                Organizzazioni
-              </span>
-              <h2 className="font-display mt-3 text-2xl font-bold text-foreground sm:text-[26px]">
-                Team, clienti, stakeholder
-              </h2>
-              <p className="font-ui mt-3 flex-1 text-sm leading-relaxed text-muted">
-                Listino e moduli dedicati: linguaggio orientato a decisioni, handoff e carico
-                comunicativo. Utile a HR, sales e leader che lavorano con dati, non con voci di
-                corridoio.
-              </p>
-              <span className="font-ui mt-6 inline-flex items-center gap-2 text-sm font-bold text-accent2">
-                Area aziende — analizza
-                <span aria-hidden className="transition group-hover:translate-x-0.5">
-                  →
-                </span>
-              </span>
-              <span className="font-ui mt-2 text-xs text-muted">Report da 29,99€ · export anonimo</span>
-            </Link>
-          </div>
-
-          <div
-            className="hero-fade-up mt-8 flex flex-wrap items-center gap-4"
-            style={{ animationDelay: "0.36s" }}
-          >
-            <Link
-              href="/#come-funziona"
-              className="font-ui text-sm font-semibold text-foreground underline-offset-4 transition hover:underline"
-            >
-              Come funziona (3 passi)
-            </Link>
-            <span className="hidden h-4 w-px bg-[var(--border)] sm:block" aria-hidden />
-            <p className="font-ui text-[13px] text-muted">
-              Pensato anche per <strong className="font-semibold text-foreground">psicologi</strong>,{" "}
-              <strong className="font-semibold text-foreground">coach</strong> e{" "}
-              <strong className="font-semibold text-foreground">people team</strong> — come supporto
-              a colloqui e supervisioni, non sostituto clinico.
-            </p>
-          </div>
         </div>
       </section>
 
-      <section id="come-funziona" className="border-b border-[var(--border)] bg-background">
-        <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
+      <PatternIndigoSection sectionRef={indigoRef} parallaxY={indigoParallaxPx} />
+
+      <section
+        ref={howItSectionRef}
+        id="come-funziona"
+        className="section-reveal border-b border-[var(--border)] bg-background"
+      >
+        <div className="howit-track relative mx-auto max-w-[1200px] px-4 sm:px-6">
+          <svg
+            className="howit-connector-svg"
+            viewBox="0 0 400 8"
+            preserveAspectRatio="none"
+            aria-hidden
+          >
+            <defs>
+              <linearGradient id="howitConnectorGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#f97316" />
+                <stop offset="50%" stopColor="#6366f1" />
+                <stop offset="100%" stopColor="#0d9488" />
+              </linearGradient>
+            </defs>
+            <path
+              pathLength={1}
+              strokeDasharray={1}
+              className="howit-connector-path"
+              style={{ strokeDashoffset: 1 - howItProgress }}
+              d="M 48 4 L 200 4 L 352 4"
+            />
+          </svg>
           <p className="font-ui text-xs font-semibold uppercase tracking-widest text-accent">
             Come funziona
           </p>
@@ -553,11 +693,14 @@ export default function Home() {
             <span className="h-3 w-3 shrink-0 rounded-full bg-[#0d9488]" />
           </div>
 
-          <ul ref={comeFunzionaRef} className="grid grid-cols-1 gap-5 md:grid-cols-3">
+          <ul
+            ref={comeFunzionaRef}
+            className="relative z-[1] grid grid-cols-1 gap-5 md:grid-cols-3"
+          >
             {steps.map((step, i) => (
               <li
                 key={step.title}
-                className="card-reveal group flex flex-col overflow-hidden rounded-[20px] border border-[var(--border)] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)] transition duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(0,0,0,0.12)]"
+                className="card-reveal home-lift-card group flex flex-col overflow-hidden rounded-[20px] border border-[var(--border)] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)] transition duration-300 ease-out"
                 style={{ transitionDelay: i === 0 ? "0s" : i === 1 ? "0.15s" : "0.3s" }}
               >
                 <div
@@ -800,16 +943,19 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="border-b border-[var(--border)]" aria-labelledby="use-cases-heading">
+      <section
+        className="section-reveal border-b border-[var(--border)]"
+        aria-labelledby="use-cases-heading"
+      >
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
           <p className="font-ui text-[12px] font-semibold uppercase tracking-widest text-accent2">
-            Due percorsi, stessa disciplina
+            Persone · Professionisti e organizzazioni
           </p>
           <h2
             id="use-cases-heading"
             className="font-display mt-3 max-w-3xl text-[32px] font-bold tracking-tight text-foreground sm:text-[36px]"
           >
-            Scegli il contesto: il metodo resta rigoroso.
+            Stesso metodo. Due mondi.
           </h2>
 
           <div className="mt-10 grid grid-cols-1 overflow-hidden rounded-2xl border border-[var(--border)] lg:grid-cols-2 lg:items-stretch">
@@ -819,11 +965,43 @@ export default function Home() {
                 Persone
               </p>
               <h3 className="font-display mt-2 text-2xl font-bold text-foreground">
-                Relazioni e benessere comunicativo
+                Capisci cosa sta succedendo davvero tra voi
               </h3>
               <p className="font-ui mt-3 text-sm leading-relaxed text-muted">
-                I casi che già conosci — con tono adulto e senza infantilizzare chi si interroga.
+                Coppie, nuove conoscenze, famiglie, amici: la pre-analisi ti dà numeri; il report unisce{" "}
+                <span className="font-medium text-foreground">metriche e lettura linguistica</span>{" "}
+                (temi, toni, ripetizioni) così vedi la conversazione intera, non solo il conteggio messaggi.
               </p>
+              <div className="mt-6 rounded-2xl border border-violet-200/90 bg-white/90 p-5 shadow-sm">
+                <p className="font-ui text-[13px] font-semibold text-foreground">
+                  Percorsi tipici (privati)
+                </p>
+                <ul className="font-ui mt-3 list-disc space-y-2 pl-4 text-[13px] leading-snug text-muted">
+                  <li>
+                    <span className="font-medium text-foreground">Coppie e convivenze:</span> equilibrio,
+                    silenzi, argomenti tabù — con supporto quantitativo e sintesi dei registri emotivi nel
+                    testo.
+                  </li>
+                  <li>
+                    <span className="font-medium text-foreground">Nuove conoscenze:</span> reciprocità,
+                    ritmo, come si parla quando c’è interesse reale rispetto a cortesia di superficie.
+                  </li>
+                  <li>
+                    <span className="font-medium text-foreground">Famiglia:</span> gruppi e sottogruppi,
+                    chi media e chi resta ai margini — oltre le battute, la struttura del thread.
+                  </li>
+                  <li>
+                    <span className="font-medium text-foreground">Amici e gruppi:</span> chi domina il
+                    turno, dove le discussioni si perdono, quali temi tornano sempre.
+                  </li>
+                </ul>
+                <Link
+                  href="/metodo"
+                  className="font-ui mt-4 inline-flex text-sm font-semibold text-accent underline-offset-4 hover:underline"
+                >
+                  Metodo, limiti e riferimenti culturali →
+                </Link>
+              </div>
               <ul className="mt-8 grid flex-1 grid-cols-1 content-start gap-5 sm:grid-cols-2">
                 {useCasesPersonal.map((uc, i) => {
                   const isLastOdd =
@@ -832,7 +1010,7 @@ export default function Home() {
                     <li
                       key={uc.title}
                       className={[
-                        "flex h-full flex-col rounded-2xl border border-violet-100 bg-white px-5 py-6 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md",
+                        "home-lift-card home-card-tap home-card-person flex h-full cursor-default flex-col rounded-2xl border border-violet-100 bg-white px-5 py-6 shadow-sm transition duration-200",
                         isLastOdd ? "sm:col-span-2 sm:mx-auto sm:w-full sm:max-w-md" : "",
                       ].join(" ")}
                     >
@@ -860,9 +1038,9 @@ export default function Home() {
               <div className="mt-10 shrink-0 border-t border-violet-100/80 pt-8 lg:mt-auto">
                 <Link
                   href="/upload"
-                  className="font-ui inline-flex w-full items-center justify-center rounded-lg bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-dark sm:w-auto"
+                  className="font-ui cta-glow-primary inline-flex w-full items-center justify-center rounded-lg bg-accent px-5 py-3 text-sm font-bold text-white transition hover:bg-accent-dark sm:w-auto"
                 >
-                  Percorso persone →
+                  Analizza — persone
                 </Link>
               </div>
             </div>
@@ -871,19 +1049,53 @@ export default function Home() {
           <div className="flex min-h-full min-w-0 flex-col bg-gradient-to-b from-teal-50/60 via-white to-amber-50/30 px-4 py-14 sm:px-6 lg:py-16">
             <div className="mx-auto flex w-full max-w-[540px] flex-1 flex-col lg:mx-auto">
               <p className="font-ui text-xs font-bold uppercase tracking-widest text-accent2">
-                Organizzazioni
+                Organizzazioni e professionisti
               </p>
               <h3 className="font-display mt-2 text-2xl font-bold text-foreground">
-                Produttività relazionale e chiarezza operativa
+                Trasforma le conversazioni in decisioni
               </h3>
               <p className="font-ui mt-3 text-sm leading-relaxed text-muted">
-                Metriche utili a decisioni: meno storytelling da riunione, più segnali nel testo.
+                Come nel privato: <span className="font-medium text-foreground">dati osservabili</span>{" "}
+                incrociati con <span className="font-medium text-foreground">comprensione del testo</span>{" "}
+                (tono, temi, sfumature). Utile a chi deve decidere o preparare colloqui — da studio clinico
+                a boardroom.
               </p>
+              <div className="mt-6 rounded-2xl border border-teal-200/90 bg-white/90 p-5 shadow-sm">
+                <p className="font-ui text-[13px] font-semibold text-foreground">
+                  Percorsi tipici (professionisti e organizzazioni)
+                </p>
+                <ul className="font-ui mt-3 list-disc space-y-2 pl-4 text-[13px] leading-snug text-muted">
+                  <li>
+                    <span className="font-medium text-foreground">Terapeuti, psicologi, counselor:</span>{" "}
+                    mappa strutturale e tematica su export anonimo per supervisione o preparazione —
+                    senza sostituire il rapporto clinico.
+                  </li>
+                  <li>
+                    <span className="font-medium text-foreground">Capiufficio e middle manager:</span>{" "}
+                    molte persone sotto, poco tempo: il “freddo” percepito spesso è asincronia o monologhi
+                    nel thread — prima di attribuire intenti.
+                  </li>
+                  <li>
+                    <span className="font-medium text-foreground">Sales, account, HR:</span> clienti e team
+                    con export anonimo e tono B2B in upload — roadmap SUBTEXT WORK.
+                  </li>
+                  <li>
+                    <span className="font-medium text-foreground">Workshop e brainstorm:</span> dopo chat
+                    lunghe, temi ricorrenti e partecipazione al turno per riallineare priorità.
+                  </li>
+                </ul>
+                <Link
+                  href="/metodo"
+                  className="font-ui mt-4 inline-flex text-sm font-semibold text-accent2 underline-offset-4 hover:underline"
+                >
+                  Cosa misuriamo davvero (e cosa no) →
+                </Link>
+              </div>
               <ul className="mt-8 grid flex-1 grid-cols-1 content-start gap-5 sm:grid-cols-2">
                 {useCasesEnterprise.map((uc) => (
                   <li
                     key={uc.title}
-                    className="flex h-full flex-col rounded-2xl border border-teal-100 bg-white px-5 py-6 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                    className="home-lift-card home-card-tap home-card-org flex h-full cursor-default flex-col rounded-2xl border border-teal-100 bg-white px-5 py-6 shadow-sm transition duration-200"
                   >
                     <span className="text-[40px] leading-none" aria-hidden>
                       {uc.emoji}
@@ -908,9 +1120,9 @@ export default function Home() {
               <div className="mt-10 shrink-0 border-t border-teal-100/80 pt-8 lg:mt-auto">
                 <Link
                   href="/upload?audience=aziende"
-                  className="font-ui inline-flex w-full items-center justify-center rounded-lg bg-accent2 px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0f766e] sm:w-auto"
+                  className="font-ui inline-flex w-full items-center justify-center rounded-lg bg-accent2 px-5 py-3 text-sm font-bold text-white shadow-md transition hover:bg-[#0f766e] sm:w-auto"
                 >
-                  Area organizzazioni →
+                  Analizza — team
                 </Link>
               </div>
             </div>
@@ -921,122 +1133,126 @@ export default function Home() {
 
       <section
         ref={statsRef}
-        className="home-strip-stats stats-strip border-b border-[var(--border)] bg-[var(--text-primary)]"
+        className="home-strip-stats section-reveal stats-strip border-b border-[var(--border)] bg-[var(--text-primary)]"
         aria-label="Numeri chiave e listini"
       >
         <div className="mx-auto max-w-[1200px] px-4 py-12 sm:px-6 sm:py-14">
           <div className="grid gap-10 md:grid-cols-2 md:gap-6">
-            <div className="stat-count-up rounded-2xl border border-white/10 bg-white/5 p-8 text-center md:text-left">
+            <div className="stat-count-up home-lift-card relative rounded-2xl border border-white/10 bg-white/5 p-8 text-center md:text-left">
+              <span className="font-ui mb-3 inline-flex self-start rounded-full bg-emerald-500/25 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-200 sm:absolute sm:right-4 sm:top-4 sm:mb-0">
+                Prima analisi gratuita
+              </span>
               <p className="font-ui text-[11px] font-bold uppercase tracking-widest text-violet-200">
                 Persone
               </p>
+              <p className="font-display mt-3 text-2xl font-bold leading-tight text-white sm:text-3xl">
+                Scopri cosa sta succedendo davvero
+              </p>
               <p className="font-display mt-2 text-4xl font-bold text-white sm:text-5xl">da 4,99€</p>
-              <p className="font-ui mt-2 text-sm text-[#c4b5fd]">Pre-analisi gratuita · report completo</p>
-              <p className="font-ui mt-4 text-xs leading-relaxed text-[#9ca3af]">
-                ~5 min · 0 dati conservati · Claude AI su testo anonimo
+              <p className="font-ui mt-4 flex flex-wrap gap-x-3 gap-y-1 text-xs text-[#a1a1aa]">
+                <span>Nessun dato salvato</span>
+                <span className="text-white/25">·</span>
+                <span>Analisi anonima</span>
               </p>
             </div>
-            <div className="stat-count-up rounded-2xl border border-white/10 bg-teal-950/40 p-8 text-center md:text-left">
+            <div className="stat-count-up home-lift-card relative rounded-2xl border border-white/10 bg-teal-950/40 p-8 text-center md:text-left">
+              <span className="font-ui mb-3 inline-flex self-start rounded-full bg-emerald-500/25 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-200 sm:absolute sm:right-4 sm:top-4 sm:mb-0">
+                Prima analisi gratuita
+              </span>
               <p className="font-ui text-[11px] font-bold uppercase tracking-widest text-teal-200">
                 Organizzazioni
               </p>
+              <p className="font-display mt-3 text-2xl font-bold leading-tight text-white sm:text-3xl">
+                Dati reali su come comunica il tuo team
+              </p>
               <p className="font-display mt-2 text-4xl font-bold text-white sm:text-5xl">da 29,99€</p>
-              <p className="font-ui mt-2 text-sm text-[#5eead4]">
-                Finestre temporali ampie · moduli e tono B2B in checkout
-              </p>
-              <p className="font-ui mt-4 text-xs leading-relaxed text-[#9ca3af]">
-                Stessa pipeline sicura · listino dedicato in pagina upload
+              <p className="font-ui mt-4 flex flex-wrap gap-x-3 gap-y-1 text-xs text-[#a1a1aa]">
+                <span>Nessun dato salvato</span>
+                <span className="text-white/25">·</span>
+                <span>Analisi anonima</span>
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="border-b border-[var(--border)] bg-background">
+      <section className="section-reveal border-b border-[var(--border)] bg-background">
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
-          <div className="mx-auto flex max-w-full flex-col gap-4 rounded-xl border border-[#fed7aa] bg-[#fff7ed] px-6 py-4 sm:flex-row sm:items-center sm:gap-4">
-            <div className="flex w-full items-center gap-4 sm:flex-1">
-              <svg
-                className="h-7 w-7 shrink-0 self-start sm:self-center"
-                width="28"
-                height="28"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden
-              >
-                <path
-                  d="M12 3.5 5 6v6c0 4.5 3.2 8.2 7 9.5 3.8-1.3 7-5 7-9.5V6l-7-2.5Z"
-                  stroke="#f97316"
-                  strokeWidth="1.75"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M12 16.2c2.5-1.8 4-3.9 4-6.2 0-1.5-1-2.8-2.3-3.2-.6-.2-1.3-.2-1.9 0C10.5 7.2 9.5 8.5 9.5 10c0 2.3 1.5 4.4 4 6.2Z"
-                  stroke="#f97316"
-                  strokeWidth="1.75"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <p className="font-ui flex-1 text-[14px] leading-relaxed text-[#92400e] sm:text-left">
-                Subtext è anche uno strumento di autoconsapevolezza. Richieste di localizzazione
-                ripetute, isolamento progressivo, cicli di tensione e perdono — certi pattern
-                hanno un nome.
+          <div className="security-warning-block mx-auto max-w-full flex-col gap-5 rounded-2xl border-2 border-[#fdba74] bg-[#fff7ed] px-6 py-6 sm:flex sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+            <div className="min-w-0 flex-1">
+              <h3 className="font-display text-xl font-bold tracking-tight text-[#9a3412] sm:text-2xl">
+                Alcuni pattern non sono normali.
+              </h3>
+              <p className="font-ui mt-3 max-w-2xl text-[15px] leading-snug text-[#92400e]">
+                Controllo, isolamento, richieste ripetute.
+                <br />
+                Quando si ripetono, non sono dettagli.
               </p>
             </div>
-            <span
-              className="hidden h-8 w-px shrink-0 self-center bg-[#fed7aa] sm:block"
-              aria-hidden
-            />
-            <a
-              href="https://www.1522.eu"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-ui mx-auto shrink-0 text-center text-[13px] font-semibold text-[#ea580c] underline-offset-2 transition hover:underline sm:mx-0 sm:text-left sm:whitespace-nowrap"
-            >
-              Numero Verde 1522 →
-            </a>
+            <div className="flex shrink-0 flex-col gap-3 sm:items-end">
+              <Link
+                href="/faq"
+                className="font-ui inline-flex items-center justify-center rounded-lg bg-[#ea580c] px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-[#c2410c]"
+              >
+                Scopri quando preoccuparti
+              </Link>
+              <a
+                href="https://www.1522.eu"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-ui text-center text-[13px] font-semibold text-[#c2410c] underline-offset-2 transition hover:underline sm:text-right"
+              >
+                Numero Verde 1522 →
+              </a>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="border-b border-[var(--border)] bg-background" aria-labelledby="why-ai-heading">
+      <section
+        id="esempio-reale"
+        className="section-reveal border-b border-[var(--border)] bg-background scroll-mt-24"
+        aria-labelledby="why-ai-heading"
+      >
         <div className="mx-auto grid max-w-[1200px] gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,280px)_1fr] lg:items-start lg:gap-14">
           <div ref={reportMockRef} className="slide-in-right flex justify-center lg:justify-start">
             <ReportMockupCard dateLabel={reportDate} />
           </div>
           <div className="min-w-0">
+            <p className="font-ui text-xs font-bold uppercase tracking-widest text-accent">
+              Esempio reale
+            </p>
             <h2
               id="why-ai-heading"
-              className="font-display text-2xl font-bold tracking-tight text-foreground"
+              className="font-display mt-2 text-2xl font-bold tracking-tight text-foreground"
             >
-              Strumento per professionisti — non una terapia in chat
+              Professionisti: metodo, non terapia in chat
             </h2>
-            <p className="font-display mt-5 text-[26px] font-bold leading-tight tracking-tight text-foreground sm:text-[28px]">
-              L&apos;AI qui è metodo di codifica, non voce autoritaria sul vissuto.
+            <p className="font-display mt-4 text-xl font-bold leading-snug tracking-tight text-foreground sm:text-2xl">
+              Dati e linguaggio insieme: metriche verificate, lettura del testo responsabile.
             </p>
-            <p className="font-ui mt-5 text-base leading-relaxed text-muted">
-              Nella pratica clinica e organizzativa si lavora da sempre su segnali osservabili
-              (turn-taking, evitamenti, escalation). Il testo digitale è un comportamento pubblico,
-              misurabile: frequenze, latenze, simmetrie. Subtext estrae quella struttura; Claude
-              (Anthropic) traduce numeri e pattern in linguaggio leggibile. Il senso profondo,
-              l&apos;etica e la decisione restano umani.
+            <p className="font-ui mt-4 text-base leading-relaxed text-muted">
+              Il motore statistico misura ritmo e simmetrie; il modello linguistico (Claude, Anthropic)
+              lavora sul corpus già anonimo per temi ricorrenti, sfumature di tono e contesto tra i
+              messaggi. Il risultato è un report che unisce{" "}
+              <span className="font-medium text-foreground">evidenza numerica</span> e{" "}
+              <span className="font-medium text-foreground">comprensione della conversazione</span> — il
+              senso profondo e la decisione restano sempre tuoi.
             </p>
-            <p className="font-ui mt-5 text-base leading-relaxed text-muted">
-              Per psicologi, coach e people team può fungere da supporto a colloqui e supervisioni —
-              come stimolo a domande precise, mai come etichetta. Per le aziende è un modo sobrio
-              di allineare percezioni su clienti e team senza passare da strumenti opachi.
+            <p className="font-ui mt-3 text-sm">
+              <Link href="/metodo" className="font-semibold text-accent underline-offset-4 hover:underline">
+                Approfondisci metodo, limiti e bibliografia →
+              </Link>
             </p>
-            <ul className="mt-8 flex flex-col gap-3">
+            <ul className="mt-6 flex flex-col gap-2.5">
               {[
                 "Nessuna diagnosi clinica",
-                "Metriche osservabili sul testo (corpus-style)",
-                "AI Anthropic su dato già anonimizzato",
+                "Metriche + sintesi tematica e toni sul testo",
+                "Claude su conversazione già anonimizzata",
               ].map((label) => (
                 <li
                   key={label}
-                  className="font-ui flex items-center gap-3 rounded-full border border-[var(--border)] bg-surface px-5 py-3 text-sm font-medium text-foreground sm:px-5 sm:text-[14px]"
+                  className="home-lift-card font-ui flex items-center gap-3 rounded-full border border-[var(--border)] bg-surface px-5 py-3 text-sm font-medium text-foreground sm:text-[14px]"
                 >
                   <span
                     className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent2-light text-accent2"
@@ -1056,51 +1272,18 @@ export default function Home() {
                 </li>
               ))}
             </ul>
-          </div>
-        </div>
-      </section>
-
-      <section ref={indigoRef} className="section-indigo bg-accent">
-        <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
-          <div
-            className="max-w-3xl space-y-5 will-change-transform"
-            style={{ transform: `translateY(${indigoParallaxPx}px)` }}
-          >
-            <p className="font-display text-2xl font-semibold italic leading-snug text-white sm:text-3xl">
-              Chi inizia sempre le conversazioni — e chi aspetta sempre che lo faccia l&apos;altro.
-            </p>
-            <p className="font-display text-2xl font-semibold italic leading-snug text-white sm:text-3xl">
-              Di cosa parlate quando siete felici. Di cosa smettete di parlare quando qualcosa non
-              va.
-            </p>
-            <p className="font-display text-2xl font-semibold italic leading-snug text-white sm:text-3xl">
-              Chi usa il tuo nome solo quando è arrabbiato. Chi sparisce per ore e poi risponde come
-              se nulla fosse.
-            </p>
-          </div>
-          <p className="font-ui mt-8 max-w-3xl text-[15px] leading-relaxed text-white/70">
-            Questi pattern esistono in ogni conversazione. Subtext li rende visibili — con dati, non
-            con interpretazioni.
-          </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Link
               href="/upload"
-              className="font-ui inline-flex items-center justify-center rounded-lg border-2 border-white px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+              className="font-ui cta-glow-primary mt-8 inline-flex items-center justify-center rounded-lg bg-accent px-5 py-3 text-sm font-bold text-white transition hover:bg-accent-dark"
             >
-              Persone — inizia gratis
-            </Link>
-            <Link
-              href="/upload?audience=aziende"
-              className="font-ui inline-flex items-center justify-center rounded-lg bg-white px-6 py-3 text-sm font-semibold text-accent transition hover:bg-violet-50"
-            >
-              Organizzazioni — listino dedicato
+              Analizza la tua chat
             </Link>
           </div>
         </div>
       </section>
 
       <section
-        className="home-trust-badges bg-[var(--surface)]"
+        className="home-trust-badges section-reveal bg-[var(--surface)]"
         aria-label="Partner e fiducia"
       >
         <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-center gap-8 px-4 sm:px-6">
@@ -1113,7 +1296,7 @@ export default function Home() {
           ].map((b) => (
             <div
               key={b.label}
-              className="font-ui inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-white px-4 py-2 text-[12px] text-[var(--text-secondary)]"
+              className="home-lift-card font-ui inline-flex items-center gap-2 rounded-full border border-[var(--border)] bg-white px-4 py-2 text-[12px] text-[var(--text-secondary)]"
             >
               <span aria-hidden>{b.icon}</span>
               <span>{b.label}</span>

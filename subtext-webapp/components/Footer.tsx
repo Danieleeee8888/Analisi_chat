@@ -8,7 +8,10 @@ export function Footer() {
           Subtext ·{" "}
           <span className="text-accent3">La struttura prima della storia.</span>
         </p>
-        <div className="flex gap-8 font-ui text-[13px]">
+        <div className="flex flex-wrap gap-x-8 gap-y-2 font-ui text-[13px]">
+          <Link href="/metodo" className="nav-link font-medium">
+            Metodo
+          </Link>
           <Link href="/privacy" className="nav-link font-medium">
             Privacy
           </Link>
