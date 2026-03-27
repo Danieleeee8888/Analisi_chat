@@ -15,6 +15,12 @@ npm start
 
 Trascina un file `.zip` nell’area indicata nella finestra dell’app.
 
+### Flusso nell’interfaccia
+
+1. Dopo il trascinamento, l’app legge la chat e mostra **l’intervallo complessivo** (dal … al …) e il **numero di messaggi** per ogni opzione di periodo.
+2. Scegli cosa elaborare: **tutta la chat**, **ultimi 2 mesi**, **ultimi 6 mesi**, **ultimo anno**, **ultimi 2 anni**. I “ultimi N mesi/anni” sono calcolati **dall’ultimo messaggio** della chat all’indietro.
+3. **Elabora** genera anonimizzato, log e metriche **solo sul periodo selezionato**. **Annulla** torna al drag&drop. A fine lavoro, **Nuova elaborazione** azzera la schermata.
+
 ## Cosa fa davvero (implementazione attuale)
 
 1. **Selezione del `.txt` nello zip**  
@@ -42,10 +48,11 @@ Nella **stessa cartella del file `.zip`** (o nella cartella passata via API come
 | File | Contenuto |
 |------|-----------|
 | `[nome_zip]_anonimizzato.txt` | Chat da distribuire dopo controllo manuale. |
-| `[nome_zip]_log.txt` | Mapping **nome reale → alias**, conteggi e avvertenza. **Non condividere**: consente di re-identificare i partecipanti. |
-| `[nome_zip]_metrics.json` | **Metriche relazionali** calcolate sulla chat già pseudonimizzata (volumi, tempi di risposta, segmenti, segnali lessicali con dizionari, serie temporali mensili, indici di bilanciamento). Non sono diagnostiche; servono al report e alle fasi successive del progetto. |
+| `[nome_zip]_ultimi2mesi_anonimizzato.txt` (e simili) | Se scegli un periodo parziale, il nome base include un suffisso (`_ultimi2mesi`, `_ultimi6mesi`, `_ultimoanno`, `_ultimi2anni`) così non sovrascrivi l’export completo. |
+| `[nome_zip]_log.txt` | Mapping **nome reale → alias**, periodo elaborato, conteggi. **Non condividere**: consente di re-identificare i partecipanti. |
+| `[nome_zip]_metrics.json` | **Metriche relazionali** sul periodo elaborato (campi `filter_period_id` / `filter_period_label` nel JSON). |
 
-Esempio: da `Chat WhatsApp con Raf.zip` → `…_anonimizzato.txt`, `…_log.txt` e `…_metrics.json`.
+Esempio: da `Chat WhatsApp con Raf.zip` → `Chat WhatsApp con Raf_anonimizzato.txt` (tutta la chat) oppure `Chat WhatsApp con Raf_ultimi2mesi_anonimizzato.txt`, più log e metriche con lo stesso suffisso.
 
 ### Metriche (`_metrics.json`)
 

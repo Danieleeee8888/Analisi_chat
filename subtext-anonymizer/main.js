@@ -1,11 +1,11 @@
 const path = require("path");
 const { app, BrowserWindow, ipcMain, shell } = require("electron");
-const { anonymizeWhatsappZip, AnonymizerWarning } = require("./anonymizer");
+const { anonymizeWhatsappZip, analyzeWhatsappZip, AnonymizerWarning } = require("./anonymizer");
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 500,
-    height: 400,
+    width: 520,
+    height: 620,
     resizable: false,
     maximizable: false,
     fullscreenable: false,
@@ -20,13 +20,41 @@ function createWindow() {
   win.loadFile(path.join(__dirname, "renderer", "index.html"));
 }
 
+ipcMain.handle("anonymizer:analyze-zip", async (_event, payload) => {
+  const { zipPath, confirmLargeFile, proceedWithoutWhatsappPattern } = payload || {};
+  try {
+    const result = await analyzeWhatsappZip(zipPath, {
+      confirmLargeFile: Boolean(confirmLargeFile),
+      proceedWithoutWhatsappPattern: Boolean(proceedWithoutWhatsappPattern)
+    });
+    return { ok: true, result };
+  } catch (error) {
+    if (error instanceof AnonymizerWarning) {
+      return {
+        ok: false,
+        type: "warning",
+        code: error.code,
+        message: error.message,
+        meta: error.meta || {}
+      };
+    }
+    return {
+      ok: false,
+      type: "error",
+      message: error.message || "Errore durante l'analisi dello zip."
+    };
+  }
+});
+
 ipcMain.handle("anonymizer:process-zip", async (_event, payload) => {
-  const { zipPath, confirmLargeFile, proceedWithoutWhatsappPattern, outputDir } = payload || {};
+  const { zipPath, confirmLargeFile, proceedWithoutWhatsappPattern, outputDir, period } =
+    payload || {};
   try {
     const result = await anonymizeWhatsappZip(zipPath, {
       confirmLargeFile: Boolean(confirmLargeFile),
       proceedWithoutWhatsappPattern: Boolean(proceedWithoutWhatsappPattern),
-      outputDir
+      outputDir,
+      period: typeof period === "string" && period.length ? period : "all"
     });
     return { ok: true, result };
   } catch (error) {

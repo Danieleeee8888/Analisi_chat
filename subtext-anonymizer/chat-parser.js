@@ -89,6 +89,37 @@ function parseWhatsAppChat(text) {
   return messages;
 }
 
+function formatAndroidLineDate(d) {
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const yy = String(d.getFullYear()).slice(-2);
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mi = String(d.getMinutes()).padStart(2, "0");
+  const sec = d.getSeconds();
+  if (sec) {
+    return `${dd}/${mm}/${yy}, ${hh}:${mi}:${String(sec).padStart(2, "0")}`;
+  }
+  return `${dd}/${mm}/${yy}, ${hh}:${mi}`;
+}
+
+/**
+ * Ricostruisce testo export stile Android (usato dopo filtro periodo).
+ */
+function messagesToWhatsAppAndroidExport(messages) {
+  const lines = [];
+  for (const m of messages) {
+    const head = `${formatAndroidLineDate(m.date)} - ${m.sender}: `;
+    const parts = m.body.split("\n");
+    const first = parts[0] ?? "";
+    lines.push(head + first);
+    for (let i = 1; i < parts.length; i++) {
+      lines.push(parts[i]);
+    }
+  }
+  return lines.join("\n");
+}
+
 module.exports = {
-  parseWhatsAppChat
+  parseWhatsAppChat,
+  messagesToWhatsAppAndroidExport
 };

@@ -3,6 +3,15 @@ const path = require("path");
 const os = require("os");
 const AdmZip = require("adm-zip");
 const { buildRelationalMetricsReport } = require("./relational-metrics");
+const { parseWhatsAppChat, messagesToWhatsAppAndroidExport } = require("./chat-parser");
+const {
+  analyzeChatText,
+  filterMessagesByPeriod,
+  getPeriodLabel,
+  getOutputBaseSuffix,
+  PERIOD_IDS,
+  formatItalianDateTime
+} = require("./period-filter");
 
 const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024;
 
@@ -178,10 +187,18 @@ function anonymizeText(originalText, participantMap) {
   return { anonymizedText: text, counts };
 }
 
-function createLogContent(participantMap, counts) {
+function createLogContent(participantMap, counts, periodInfo = null) {
   const lines = [];
   lines.push("=== LOG ANONIMIZZAZIONE SUBTEXT ===");
   lines.push("");
+  if (periodInfo) {
+    lines.push(`Periodo elaborato: ${periodInfo.label}`);
+    if (periodInfo.dateStartLabel && periodInfo.dateEndLabel) {
+      lines.push(`Intervallo messaggi: dal ${periodInfo.dateStartLabel} al ${periodInfo.dateEndLabel}`);
+    }
+    lines.push(`Messaggi nel periodo: ${periodInfo.messageCount}`);
+    lines.push("");
+  }
   lines.push("Mapping partecipanti (NON condividere questo file):");
   if (participantMap.size === 0) {
     lines.push("- Nessun partecipante identificato");
@@ -201,6 +218,47 @@ function createLogContent(participantMap, counts) {
   );
 
   return lines.join("\n");
+}
+
+function extractTxtFromZip(zipPath) {
+  const zip = new AdmZip(zipPath);
+  const txtEntry = selectTxtEntry(zip.getEntries());
+  if (!txtEntry) {
+    throw new Error("Lo .zip non contiene alcun file .txt.");
+  }
+  return normalizeUnusualLineTerminators(txtEntry.getData().toString("utf8"));
+}
+
+/**
+ * Legge lo zip e restituisce intervallo date della chat e anteprime per periodo (senza anonimizzare).
+ */
+function analyzeWhatsappZip(zipPath, options = {}) {
+  const { confirmLargeFile = false, proceedWithoutWhatsappPattern = false } = options;
+
+  const stats = fs.statSync(zipPath);
+  if (stats.size > MAX_FILE_SIZE_BYTES && !confirmLargeFile) {
+    throw new AnonymizerWarning(
+      "FILE_TOO_LARGE",
+      "Il file supera 50MB. Vuoi procedere comunque?",
+      { sizeBytes: stats.size }
+    );
+  }
+
+  const originalText = extractTxtFromZip(zipPath);
+
+  const whatsappLike = hasWhatsappHeaders(originalText);
+  if (!whatsappLike && !proceedWithoutWhatsappPattern) {
+    throw new AnonymizerWarning(
+      "NOT_WHATSAPP_PATTERN",
+      "Il .txt non sembra una chat WhatsApp riconoscibile. Vuoi procedere comunque?"
+    );
+  }
+
+  const summary = analyzeChatText(originalText);
+  return {
+    ...summary,
+    zipSizeBytes: stats.size
+  };
 }
 
 function ensureWritableDir(targetDir) {
@@ -226,7 +284,8 @@ async function anonymizeWhatsappZip(zipPath, options = {}) {
   const {
     confirmLargeFile = false,
     proceedWithoutWhatsappPattern = false,
-    outputDir
+    outputDir,
+    period = PERIOD_IDS.ALL
   } = options;
 
   const stats = fs.statSync(zipPath);
@@ -238,14 +297,7 @@ async function anonymizeWhatsappZip(zipPath, options = {}) {
     );
   }
 
-  const zip = new AdmZip(zipPath);
-  const txtEntry = selectTxtEntry(zip.getEntries());
-  if (!txtEntry) {
-    throw new Error("Lo .zip non contiene alcun file .txt.");
-  }
-
-  const txtBuffer = txtEntry.getData();
-  const originalText = normalizeUnusualLineTerminators(txtBuffer.toString("utf8"));
+  const originalText = extractTxtFromZip(zipPath);
 
   const whatsappLike = hasWhatsappHeaders(originalText);
   if (!whatsappLike && !proceedWithoutWhatsappPattern) {
@@ -255,25 +307,56 @@ async function anonymizeWhatsappZip(zipPath, options = {}) {
     );
   }
 
-  const participantMap = buildParticipantMap(originalText);
-  const { anonymizedText, counts } = anonymizeText(originalText, participantMap);
+  const messages = parseWhatsAppChat(originalText);
+  if (!messages.length) {
+    throw new Error("Nessun messaggio parsato dal file .txt.");
+  }
+
+  let workingText = originalText;
+  let filteredMessages = messages;
+  if (period !== PERIOD_IDS.ALL) {
+    filteredMessages = filterMessagesByPeriod(messages, period);
+    if (!filteredMessages.length) {
+      throw new Error(
+        "Nessun messaggio nel periodo selezionato. Scegli un intervallo più ampio o «Tutta la chat»."
+      );
+    }
+    workingText = messagesToWhatsAppAndroidExport(filteredMessages);
+  }
+
+  const participantMap = buildParticipantMap(workingText);
+  const { anonymizedText, counts } = anonymizeText(workingText, participantMap);
 
   const resolvedOutputDir = outputDir || path.dirname(zipPath);
   ensureWritableDir(resolvedOutputDir);
 
   const baseName = path.basename(zipPath, path.extname(zipPath));
-  const outputFileName = `${baseName}_anonimizzato.txt`;
-  const logFileName = `${baseName}_log.txt`;
-  const metricsFileName = `${baseName}_metrics.json`;
+  const periodSuffix = getOutputBaseSuffix(period);
+  const baseOut = `${baseName}${periodSuffix}`;
+  const outputFileName = `${baseOut}_anonimizzato.txt`;
+  const logFileName = `${baseOut}_log.txt`;
+  const metricsFileName = `${baseOut}_metrics.json`;
 
   const outputPath = path.join(resolvedOutputDir, outputFileName);
   const logPath = path.join(resolvedOutputDir, logFileName);
   const metricsPath = path.join(resolvedOutputDir, metricsFileName);
 
+  const firstInPeriod = filteredMessages[0];
+  const lastInPeriod = filteredMessages[filteredMessages.length - 1];
+  const periodInfo = {
+    label: getPeriodLabel(period),
+    dateStartLabel: formatItalianDateTime(firstInPeriod.date),
+    dateEndLabel: formatItalianDateTime(lastInPeriod.date),
+    messageCount: filteredMessages.length
+  };
+
   fs.writeFileSync(outputPath, anonymizedText, "utf8");
-  fs.writeFileSync(logPath, createLogContent(participantMap, counts), "utf8");
+  fs.writeFileSync(logPath, createLogContent(participantMap, counts, periodInfo), "utf8");
 
   const metricsReport = buildRelationalMetricsReport(anonymizedText);
+  metricsReport.chat_metadata.filter_period_id = period;
+  metricsReport.chat_metadata.filter_period_label = getPeriodLabel(period);
+  metricsReport.chat_metadata.filtered_message_count = filteredMessages.length;
   fs.writeFileSync(metricsPath, JSON.stringify(metricsReport, null, 2), "utf8");
 
   return {
@@ -285,12 +368,16 @@ async function anonymizeWhatsappZip(zipPath, options = {}) {
       realName,
       alias
     })),
-    counts
+    counts,
+    period,
+    filteredMessageCount: filteredMessages.length
   };
 }
 
 module.exports = {
   anonymizeWhatsappZip,
+  analyzeWhatsappZip,
   AnonymizerWarning,
-  buildRelationalMetricsReport
+  buildRelationalMetricsReport,
+  PERIOD_IDS
 };

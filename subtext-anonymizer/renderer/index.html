@@ -16,11 +16,53 @@
         <p class="hint">Supportato: file .zip esportato da WhatsApp</p>
       </section>
 
+      <section id="periodPanel" class="period-panel hidden" aria-live="polite">
+        <h2 class="period-title">Periodo da elaborare</h2>
+        <p id="periodRangeSummary" class="period-summary"></p>
+        <fieldset class="period-fieldset">
+          <legend class="visually-hidden">Intervallo</legend>
+          <label class="period-option">
+            <input type="radio" name="period" value="all" checked />
+            <span>Tutta la chat</span>
+            <span id="preview-all" class="period-preview"></span>
+          </label>
+          <label class="period-option">
+            <input type="radio" name="period" value="last2months" />
+            <span>Ultimi 2 mesi</span>
+            <span id="preview-last2months" class="period-preview"></span>
+          </label>
+          <label class="period-option">
+            <input type="radio" name="period" value="last6months" />
+            <span>Ultimi 6 mesi</span>
+            <span id="preview-last6months" class="period-preview"></span>
+          </label>
+          <label class="period-option">
+            <input type="radio" name="period" value="last1year" />
+            <span>Ultimo anno</span>
+            <span id="preview-last1year" class="period-preview"></span>
+          </label>
+          <label class="period-option">
+            <input type="radio" name="period" value="last2years" />
+            <span>Ultimi 2 anni</span>
+            <span id="preview-last2years" class="period-preview"></span>
+          </label>
+        </fieldset>
+        <div class="period-actions">
+          <button id="runBtn" type="button" class="btn-primary">Elabora</button>
+          <button id="cancelPeriodBtn" type="button" class="btn-secondary">Annulla</button>
+        </div>
+      </section>
+
       <section id="status" class="status idle">In attesa di un file .zip</section>
 
       <section id="result" class="result hidden">
-        <p id="outputPath"></p>
-        <button id="openFolderBtn" type="button">Apri cartella</button>
+        <div class="result-paths">
+          <p id="outputPath"></p>
+        </div>
+        <div class="result-actions">
+          <button id="openFolderBtn" type="button" class="btn-primary">Apri cartella</button>
+          <button id="newRunBtn" type="button" class="btn-secondary">Nuova elaborazione</button>
+        </div>
       </section>
     </main>
 
