@@ -2,11 +2,18 @@
 
 import { useSearchParams } from "next/navigation";
 import { UploadFlow } from "@/components/UploadFlow";
-import { audienceFromQueryParam } from "@/lib/context-form-types";
+import {
+  audienceFromQueryParam,
+  focusFromQueryParam,
+  isEnterpriseFocus
+} from "@/lib/context-form-types";
 
 export function UploadPageClient() {
   const sp = useSearchParams();
-  const audienceSegment = audienceFromQueryParam(sp.get("audience"));
+  const focusParam = focusFromQueryParam(sp.get("focus"));
+  const audienceParam = audienceFromQueryParam(sp.get("audience"));
 
-  return <UploadFlow audienceSegment={audienceSegment} />;
+  const audienceSegment = isEnterpriseFocus(focusParam) ? "enterprise" : audienceParam;
+
+  return <UploadFlow audienceSegment={audienceSegment} focus={focusParam} />;
 }

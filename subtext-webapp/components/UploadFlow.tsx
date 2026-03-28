@@ -5,7 +5,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ContextForm } from "@/components/ContextForm";
 import { UploadZone } from "@/components/UploadZone";
-import type { AudienceSegment, ContextFormData } from "@/lib/context-form-types";
+import {
+  isEnterpriseFocus,
+  type AudienceSegment,
+  type ContextFormData,
+  type UploadFocus
+} from "@/lib/context-form-types";
+import { getUploadConfig } from "@/lib/upload-config";
 import { PREVIEW_SESSION_KEY, type PreviewSessionPayload } from "@/lib/preview-storage";
 
 type ProcessChatOk = {
@@ -21,12 +27,16 @@ type ProcessChatErr = {
   error: string;
 };
 
-export function UploadFlow({
-  audienceSegment = "personal"
-}: {
+interface UploadFlowProps {
   audienceSegment?: AudienceSegment;
-}) {
-  const isEnt = audienceSegment === "enterprise";
+  focus?: UploadFocus | null;
+}
+
+export function UploadFlow({ audienceSegment = "personal", focus = null }: UploadFlowProps) {
+  const configFocus: UploadFocus =
+    focus ?? (audienceSegment === "enterprise" ? null : "coppia");
+  const config = getUploadConfig(configFocus);
+  const isEnt = audienceSegment === "enterprise" || isEnterpriseFocus(focus);
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
@@ -150,7 +160,10 @@ export function UploadFlow({
           isEnt ? "upload-hero--ent" : "upload-hero--personal",
         ].join(" ")}
       >
-        <div className="pointer-events-none absolute inset-0 upload-hero-gradient" aria-hidden />
+        <div
+          className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${config.heroGradient}`}
+          aria-hidden
+        />
         <div
           className={[
             "pointer-events-none absolute -right-16 top-0 h-64 w-64 rounded-full blur-3xl",
@@ -183,71 +196,76 @@ export function UploadFlow({
           <div className="mt-8 grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_200px]">
             <div className="min-w-0">
               <span
-                className={[
-                  "inline-flex rounded-full px-3 py-1 font-ui text-[11px] font-bold uppercase tracking-widest",
-                  isEnt
-                    ? "bg-teal-100 text-teal-900 ring-1 ring-teal-200/80"
-                    : "bg-violet-100 text-violet-900 ring-1 ring-violet-200/80",
-                ].join(" ")}
+                className={`inline-flex rounded-full px-3 py-1 font-ui text-[11px] font-bold uppercase tracking-widest ring-1 ${config.badgeClass}`}
               >
-                {isEnt ? "Subtext · organizzazioni" : "Subtext · persone"}
+                {isEnt ? "Subtext · Professional" : "Subtext · Personal"}
+                {" · "}
+                {config.badge}
               </span>
               <h1 className="font-display mt-5 text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-[2.5rem] lg:leading-tight">
-                {isEnt
-                  ? "Da export a insight operativo, senza archiviare il dialogo"
-                  : "Carica la conversazione. Estrai la struttura, non solo i messaggi."}
+                {config.title.split("\n").map((line, i) => (
+                  <span key={i} className="block">
+                    {line}
+                  </span>
+                ))}
               </h1>
               <p className="font-ui mt-4 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
+                {config.subtitle.split("\n").map((line, i) => (
+                  <span key={i} className="block">
+                    {line}
+                  </span>
+                ))}
+              </p>
+              <ul className="font-ui mt-6 flex flex-wrap gap-x-5 gap-y-2 text-[12px] font-medium text-[var(--text-secondary)]">
                 {isEnt ? (
                   <>
-                    Team, clienti, fornitori, workshop — e professionisti che usano export anonimi per
-                    preparare colloqui: stesso flusso sicuro, report con metriche e sintesi tematica.
-                    Listino dedicato; per <span className="font-medium text-foreground">altri canali</span>{" "}
-                    (Slack, Teams, formati su misura){" "}
-                    <Link href="/contatti" className="font-semibold text-accent2 underline-offset-2 hover:underline">
-                      contattaci
-                    </Link>{" "}
-                    per <span className="font-medium text-foreground">piani personalizzati</span>.
+                    <li className="flex items-center gap-2">
+                      <span
+                        className={["h-1.5 w-1.5 rounded-full", "bg-accent2"].join(" ")}
+                        aria-hidden
+                      />
+                      Anonimizzazione pre-AI garantita
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span
+                        className={["h-1.5 w-1.5 rounded-full", "bg-accent2"].join(" ")}
+                        aria-hidden
+                      />
+                      Zero archivio testuale
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span
+                        className={["h-1.5 w-1.5 rounded-full", "bg-accent2"].join(" ")}
+                        aria-hidden
+                      />
+                      Report PDF condivisibile
+                    </li>
                   </>
                 ) : (
                   <>
-                    File .zip da WhatsApp (anche senza media). Pre-analisi gratuita in locale; report
-                    completo che unisce ritmi misurabili e lettura di temi e toni sul testo già
-                    anonimizzato.
+                    <li className="flex items-center gap-2">
+                      <span
+                        className={["h-1.5 w-1.5 rounded-full", "bg-accent"].join(" ")}
+                        aria-hidden
+                      />
+                      Nessun archivio della chat
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span
+                        className={["h-1.5 w-1.5 rounded-full", "bg-accent"].join(" ")}
+                        aria-hidden
+                      />
+                      Analisi anonima
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span
+                        className={["h-1.5 w-1.5 rounded-full", "bg-accent"].join(" ")}
+                        aria-hidden
+                      />
+                      Pre-analisi gratuita
+                    </li>
                   </>
                 )}
-              </p>
-              <ul className="font-ui mt-6 flex flex-wrap gap-x-5 gap-y-2 text-[12px] font-medium text-[var(--text-secondary)]">
-                <li className="flex items-center gap-2">
-                  <span
-                    className={[
-                      "h-1.5 w-1.5 rounded-full",
-                      isEnt ? "bg-accent2" : "bg-accent",
-                    ].join(" ")}
-                    aria-hidden
-                  />
-                  Nessun archivio della chat
-                </li>
-                <li className="flex items-center gap-2">
-                  <span
-                    className={[
-                      "h-1.5 w-1.5 rounded-full",
-                      isEnt ? "bg-accent2" : "bg-accent",
-                    ].join(" ")}
-                    aria-hidden
-                  />
-                  Anonimizzazione pre-AI
-                </li>
-                <li className="flex items-center gap-2">
-                  <span
-                    className={[
-                      "h-1.5 w-1.5 rounded-full",
-                      isEnt ? "bg-accent2" : "bg-accent",
-                    ].join(" ")}
-                    aria-hidden
-                  />
-                  Pre-analisi gratuita
-                </li>
               </ul>
             </div>
 
@@ -261,10 +279,8 @@ export function UploadFlow({
               aria-hidden
             >
               <div
-                className={[
-                  "flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-md",
-                  isEnt ? "bg-accent2" : "bg-accent",
-                ].join(" ")}
+                className={`flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-md ${config.orbitBg}`}
+                style={{ boxShadow: config.orbitGlow }}
               >
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
                   <path
@@ -353,8 +369,9 @@ export function UploadFlow({
             </p>
             <div className="mt-6 max-w-lg">
               <ContextForm
-                key={audienceSegment}
+                key={`${audienceSegment}-${focus ?? ""}`}
                 audienceSegment={audienceSegment}
+                focus={focus}
                 disabled={!file}
                 isSubmitting={isSubmitting}
                 onSubmit={handleAnalyze}

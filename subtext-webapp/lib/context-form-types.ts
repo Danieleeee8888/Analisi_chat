@@ -6,6 +6,47 @@ export type RelationshipType =
   | "gruppo"
   | "lavoro";
 
+export type UploadFocus =
+  | "dating"
+  | "coppia"
+  | "famiglia"
+  | "amici"
+  | "completo"
+  | "team"
+  | "brainstorming"
+  | "pro"
+  | "sales"
+  | null;
+
+const UPLOAD_FOCUS_VALUES = [
+  "dating",
+  "coppia",
+  "famiglia",
+  "amici",
+  "completo",
+  "team",
+  "brainstorming",
+  "pro",
+  "sales"
+] as const satisfies readonly Exclude<UploadFocus, null>[];
+
+export function focusFromQueryParam(param: string | null | undefined): UploadFocus {
+  if (!param) return null;
+  const x = param.trim().toLowerCase();
+  return (UPLOAD_FOCUS_VALUES as readonly string[]).includes(x) ? (x as UploadFocus) : null;
+}
+
+export function isEnterpriseFocus(focus: UploadFocus): boolean {
+  return (
+    focus === "team" ||
+    focus === "brainstorming" ||
+    focus === "pro" ||
+    focus === "sales"
+  );
+}
+
+export type AnalysisMode = "comunicativo" | "tematico";
+
 /** Privati vs organizzazioni — impostato dalla home / query upload, non dal singolo campo testo. */
 export type AudienceSegment = "personal" | "enterprise";
 
@@ -47,18 +88,102 @@ export interface ContextFormData {
   ageBand: string;
   specificQuestion: string;
   analysisPeriod: AnalysisPeriod;
+  /** Opzionale: le route API attuali non lo persistono in round-trip; inviato dal client per coerenza. */
+  analysisMode?: AnalysisMode;
 }
 
-export function createEmptyForm(segment: AudienceSegment): ContextFormData {
+export function defaultsForFocus(focus: UploadFocus): {
+  relationshipType: RelationshipType;
+  analysisMode: AnalysisMode;
+  analysisPeriod: AnalysisPeriod;
+  audienceSegment: AudienceSegment;
+} {
+  switch (focus) {
+    case "dating":
+      return {
+        relationshipType: "conoscenza",
+        analysisMode: "tematico",
+        analysisPeriod: "2months",
+        audienceSegment: "personal"
+      };
+    case "coppia":
+      return {
+        relationshipType: "coppia",
+        analysisMode: "comunicativo",
+        analysisPeriod: "6months",
+        audienceSegment: "personal"
+      };
+    case "famiglia":
+      return {
+        relationshipType: "famiglia",
+        analysisMode: "comunicativo",
+        analysisPeriod: "6months",
+        audienceSegment: "personal"
+      };
+    case "amici":
+      return {
+        relationshipType: "amicizia",
+        analysisMode: "tematico",
+        analysisPeriod: "6months",
+        audienceSegment: "personal"
+      };
+    case "completo":
+      return {
+        relationshipType: "coppia",
+        analysisMode: "comunicativo",
+        analysisPeriod: "full",
+        audienceSegment: "personal"
+      };
+    case "team":
+      return {
+        relationshipType: "gruppo",
+        analysisMode: "comunicativo",
+        analysisPeriod: "6months",
+        audienceSegment: "enterprise"
+      };
+    case "brainstorming":
+      return {
+        relationshipType: "gruppo",
+        analysisMode: "tematico",
+        analysisPeriod: "2months",
+        audienceSegment: "enterprise"
+      };
+    case "pro":
+      return {
+        relationshipType: "lavoro",
+        analysisMode: "comunicativo",
+        analysisPeriod: "full",
+        audienceSegment: "enterprise"
+      };
+    case "sales":
+      return {
+        relationshipType: "lavoro",
+        analysisMode: "tematico",
+        analysisPeriod: "6months",
+        audienceSegment: "enterprise"
+      };
+    default:
+      return {
+        relationshipType: "coppia",
+        analysisMode: "comunicativo",
+        analysisPeriod: "6months",
+        audienceSegment: "personal"
+      };
+  }
+}
+
+export function createEmptyForm(segment: AudienceSegment, focus?: UploadFocus): ContextFormData {
+  const defaults = defaultsForFocus(focus ?? null);
   return {
     audienceSegment: segment,
-    relationshipType: segment === "enterprise" ? "lavoro" : "coppia",
+    relationshipType: defaults.relationshipType,
     whoAreYou: "",
     howLongKnown: "",
     liveOrWorkTogether: "no",
     ageBand: "",
     specificQuestion: "",
-    analysisPeriod: "6months"
+    analysisPeriod: defaults.analysisPeriod,
+    analysisMode: defaults.analysisMode
   };
 }
 
@@ -146,10 +271,10 @@ export function periodOptionsForSegment(segment: AudienceSegment): PeriodOption[
 export const RELATIONSHIP_OPTIONS: { value: RelationshipType; label: string }[] = [
   { value: "coppia", label: "Coppia" },
   { value: "conoscenza", label: "Ci stiamo conoscendo" },
-  { value: "amicizia", label: "Amicizia" },
+  { value: "amicizia", label: "Amicizia o gruppo di amici" },
   { value: "famiglia", label: "Famiglia" },
-  { value: "gruppo", label: "Gruppo" },
-  { value: "lavoro", label: "Lavoro" }
+  { value: "gruppo", label: "Gruppo (misto)" },
+  { value: "lavoro", label: "Lavoro o professione" }
 ];
 
 export const HOW_LONG_OPTIONS = [

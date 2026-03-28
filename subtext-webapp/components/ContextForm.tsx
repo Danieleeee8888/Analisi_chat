@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import {
   AGE_BAND_OPTIONS,
@@ -9,13 +8,35 @@ import {
   periodOptionsForSegment,
   RELATIONSHIP_OPTIONS,
   RELATIONSHIP_OPTIONS_ENTERPRISE,
+  type AnalysisMode,
   type AudienceSegment,
-  type ContextFormData
+  type ContextFormData,
+  type UploadFocus
 } from "@/lib/context-form-types";
+import { getUploadConfig } from "@/lib/upload-config";
+
+function relationshipLabel(focus: UploadFocus | null | undefined, isEnt: boolean): string {
+  if (isEnt) return "Contesto della conversazione";
+  switch (focus) {
+    case "dating":
+      return "Che tipo di conoscenza è?";
+    case "coppia":
+      return "Com'è la vostra relazione?";
+    case "famiglia":
+      return "Di che tipo di legame si tratta?";
+    case "amici":
+      return "Che tipo di amicizia o gruppo è?";
+    case "completo":
+      return "Che tipo di relazione è?";
+    default:
+      return "Tipo di relazione";
+  }
+}
 
 export interface ContextFormProps {
   /** Da URL / home: determina copy, prezzi e opzioni periodo. */
   audienceSegment: AudienceSegment;
+  focus?: UploadFocus | null;
   disabled?: boolean;
   /** Disabilita campi e mostra stato invio (API). */
   isSubmitting?: boolean;
@@ -36,6 +57,7 @@ function formatPeekDateFragment(raw: string | null): string {
 
 export function ContextForm({
   audienceSegment,
+  focus = null,
   disabled,
   isSubmitting,
   onSubmit,
@@ -43,10 +65,20 @@ export function ContextForm({
   chatMeta = null
 }: ContextFormProps) {
   const isEnt = audienceSegment === "enterprise";
-  const [data, setData] = useState(() => createEmptyForm(audienceSegment));
+  const configFocus: UploadFocus =
+    focus ?? (audienceSegment === "enterprise" ? null : "coppia");
+  const config = getUploadConfig(configFocus);
+  const [data, setData] = useState(() => createEmptyForm(audienceSegment, focus ?? null));
   const locked = Boolean(disabled || isSubmitting);
   const periodOpts = periodOptionsForSegment(audienceSegment);
-  const relOpts = isEnt ? RELATIONSHIP_OPTIONS_ENTERPRISE : RELATIONSHIP_OPTIONS;
+  const relOptsPersonal =
+    focus === "amici"
+      ? [
+          ...RELATIONSHIP_OPTIONS.filter((o) => o.value === "amicizia"),
+          ...RELATIONSHIP_OPTIONS.filter((o) => o.value !== "amicizia")
+        ]
+      : RELATIONSHIP_OPTIONS;
+  const relOpts = isEnt ? RELATIONSHIP_OPTIONS_ENTERPRISE : relOptsPersonal;
 
   const fieldClass = [
     "mt-1.5 w-full rounded-lg border bg-white px-3 py-2 font-ui text-sm text-foreground shadow-sm placeholder:text-muted focus:outline-none disabled:opacity-50",
@@ -75,60 +107,34 @@ export function ContextForm({
   const selectedPeriod = periodOpts.find((o) => o.value === data.analysisPeriod);
   const buttonLabel = isSubmitting
     ? "Elaborazione in corso…"
-    : `Analizza · ${selectedPeriod?.price ?? (isEnt ? "59,99€" : "4,99€")}`;
+    : `${config.ctaLabel}${selectedPeriod?.price ?? (isEnt ? "59,99€" : "4,99€")}`;
 
   const periodAccentSelected = isEnt
     ? "border-accent2 bg-accent2-light"
     : "border-accent bg-accent-light";
   const periodAccentHover = isEnt ? "hover:border-accent2/50" : "hover:border-accent/40";
   const periodPriceSelected = isEnt ? "text-accent2" : "text-accent";
-  const submitClass = isEnt
-    ? "bg-accent2 hover:bg-[#0f766e] focus-visible:ring-accent2/30"
-    : "bg-accent hover:bg-accent-dark focus-visible:ring-accent/25";
+  const submitClass =
+    focus === "pro"
+      ? "bg-[#7c3aed] hover:opacity-90 focus-visible:ring-[#7c3aed]/35"
+      : isEnt
+        ? "bg-accent2 hover:bg-[#0f766e] focus-visible:ring-accent2/30"
+        : "bg-accent hover:bg-accent-dark focus-visible:ring-accent/25";
 
   return (
     <>
-      {isEnt && (
-        <div className="mb-6 rounded-2xl border border-teal-200/80 bg-gradient-to-br from-teal-50/90 to-white px-5 py-4 font-ui text-sm text-foreground shadow-sm">
-          <p className="font-semibold text-accent2">Contesto organizzativo</p>
-          <p className="mt-2 leading-relaxed text-muted">
-            Stesse garanzie del percorso privato: parsing in memoria, anonimizzazione prima dell’AI, zero
-            archivio testuale. Il report unisce{" "}
-            <span className="font-medium text-foreground">metriche osservabili</span> e{" "}
-            <span className="font-medium text-foreground">lettura di contesto, tono e temi</span> sul testo
-            anonimo — utile a decisioni e a preparazione professionale.
-          </p>
-          <p className="mt-3 rounded-lg border border-teal-200/60 bg-white/80 px-3 py-2 text-[13px] leading-snug text-muted">
-            <span className="font-medium text-foreground">Altri canali oltre WhatsApp?</span> Per team e
-            organizzazioni sono valutabili{" "}
-            <span className="font-medium text-foreground">piani personalizzati</span> (es. Slack, Teams,
-            export da altre piattaforme).{" "}
-            <Link href="/contatti" className="font-semibold text-accent2 underline-offset-2 hover:underline">
-              Scrivici in contatti
-            </Link>{" "}
-            per strutturare il flusso.
-          </p>
-          <ul className="mt-3 list-disc space-y-1 pl-4 text-[13px] leading-snug text-muted">
-            <li>
-              Terapeuti, psicologi, counselor: sintesi strutturale per supervisione — non sostituto
-              clinico.
-            </li>
-            <li>Manager e capiufficio: ritmo con molti collaboratori, rischio di essere letti come “freddi”.</li>
-            <li>Sales / account / HR: handoff, escalation, carico asincrono nel thread.</li>
-            <li>Brainstorm e progetti: riordino di temi e turni dopo chat lunghe.</li>
-          </ul>
-        </div>
-      )}
-
-      {!isEnt && (
-        <div className="mb-6 rounded-2xl border border-violet-200/80 bg-gradient-to-br from-violet-50/80 to-white px-5 py-4 font-ui text-sm shadow-sm">
-          <p className="font-semibold text-accent">Contesto personale</p>
-          <p className="mt-2 leading-relaxed text-muted">
-            Coppie, nuove conoscenze, famiglia, amici. Il campo libero può indicare cosa vuoi chiarire
-            (es. dopo un periodo difficile): il modello incrocia numeri e linguaggio sul testo anonimo.
-          </p>
-        </div>
-      )}
+      <div
+        className={`mb-6 rounded-2xl border px-5 py-4 font-ui text-sm shadow-sm ${
+          isEnt
+            ? "border-teal-200/80 bg-gradient-to-br from-teal-50/90 to-white"
+            : "border-violet-200/80 bg-gradient-to-br from-violet-50/80 to-white"
+        }`}
+      >
+        <p className={`font-semibold ${isEnt ? "text-accent2" : "text-accent"}`}>
+          {isEnt ? "Contesto professionale" : "Contesto personale"}
+        </p>
+        <p className="mt-2 leading-relaxed text-muted">{config.contextIntro}</p>
+      </div>
 
       {chatMeta && (
         <div
@@ -147,7 +153,7 @@ export function ContextForm({
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label htmlFor="relationship" className="font-ui block text-sm font-medium text-foreground">
-            1. {isEnt ? "Contesto della conversazione" : "Tipo di relazione"}
+            1. {relationshipLabel(focus, isEnt)}
           </label>
           <select
             id="relationship"
@@ -173,10 +179,7 @@ export function ContextForm({
 
         <div>
           <label htmlFor="whoAreYou" className="font-ui block text-sm font-medium text-foreground">
-            2.{" "}
-            {isEnt
-              ? "Il tuo ruolo (come compare nella chat)"
-              : "Chi sei tu in questa chat?"}
+            2. {config.whoLabel}
           </label>
           {participants.length > 0 && (
             <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -206,11 +209,7 @@ export function ContextForm({
             id="whoAreYou"
             type="text"
             autoComplete="off"
-            placeholder={
-              isEnt
-                ? "Es. nome e ruolo come in WhatsApp / Slack export"
-                : "Es. il mio nome come compare in WhatsApp"
-            }
+            placeholder={config.whoPlaceholder}
             className={fieldClass}
             value={data.whoAreYou}
             onChange={(e) => update("whoAreYou", e.target.value)}
@@ -309,11 +308,7 @@ export function ContextForm({
           <textarea
             id="specific"
             rows={3}
-            placeholder={
-              isEnt
-                ? "Es. capire se il cliente percepisce ritardi strutturali, o se il team evita decisioni…"
-                : "Es. capire se ci sono pattern dopo le litigate…"
-            }
+            placeholder={config.questionPlaceholder}
             className={`${fieldClass} resize-y`}
             value={data.specificQuestion}
             onChange={(e) => update("specificQuestion", e.target.value)}
@@ -321,8 +316,41 @@ export function ContextForm({
           />
         </div>
 
+        <fieldset disabled={locked} className="space-y-2">
+          <legend className="font-ui text-sm font-medium text-foreground">
+            7. Comunicativo o tematico?
+          </legend>
+          <p className="font-ui text-[12px] leading-snug text-[var(--text-secondary)]">
+            {isEnt
+              ? "Comunicativo: ritmi, turni, escalation. Tematico: temi ricorrenti e fili del discorso."
+              : "Comunicativo: chi riprende, silenzi, equilibrio. Tematico: argomenti, toni, ripetizioni."}
+          </p>
+          <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:gap-6">
+            <label className="font-ui flex cursor-pointer items-center gap-2 text-sm text-muted">
+              <input
+                type="radio"
+                name="analysisMode"
+                className={radioAccentClass}
+                checked={(data.analysisMode ?? "comunicativo") === "comunicativo"}
+                onChange={() => update("analysisMode", "comunicativo" satisfies AnalysisMode)}
+              />
+              Comunicativo
+            </label>
+            <label className="font-ui flex cursor-pointer items-center gap-2 text-sm text-muted">
+              <input
+                type="radio"
+                name="analysisMode"
+                className={radioAccentClass}
+                checked={data.analysisMode === "tematico"}
+                onChange={() => update("analysisMode", "tematico")}
+              />
+              Tematico
+            </label>
+          </div>
+        </fieldset>
+
         <div>
-          <p className="font-ui text-sm font-medium text-foreground">7. Quanto vuoi analizzare?</p>
+          <p className="font-ui text-sm font-medium text-foreground">8. Quanto vuoi analizzare?</p>
           <p className="mt-0.5 font-ui text-[12px] text-[var(--text-secondary)]">
             {isEnt
               ? "Finestra temporale e profondità del report — listino dedicato organizzazioni"

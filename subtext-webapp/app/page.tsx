@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { PlansSection } from "@/components/PlansSection";
 
 const steps = [
   {
-    title: "Carica la conversazione",
+    title: "Carica e anonimizza",
     description:
-      "Export .zip da WhatsApp (anche senza media). Elaborazione in memoria: niente archivio della tua chat.",
+      "Export .zip da WhatsApp (anche senza media). Anonimizzazione automatica in memoria: nessun archivio della chat lato servizio.",
     highlight: "Nessun dato salvato dopo l'analisi",
     Icon: StepIconUpload,
     accentClass: "text-accent3",
@@ -15,9 +16,9 @@ const steps = [
     visualClass: "bg-gradient-to-br from-[#fff7ed] to-[#fed7aa]",
   },
   {
-    title: "Guarda cosa emerge",
+    title: "Metriche e lettura AI",
     description:
-      "Pre-analisi gratuita: volumi, pause, chi riapre — poi il modello legge il testo anonimo per temi, toni e ripetizioni, non solo conteggi.",
+      "Pre-analisi gratuita: ritmo, turni, volumi. Poi Claude legge il testo già anonimo per temi, toni e contesto — non solo conteggi.",
     highlight: "Elaborazione sicura + AI (Claude)",
     Icon: StepIconChart,
     accentClass: "text-accent",
@@ -25,14 +26,49 @@ const steps = [
     visualClass: "bg-gradient-to-br from-[#eef2ff] to-[#c7d2fe]",
   },
   {
-    title: "Capisci cosa significa",
+    title: "Report e PDF",
     description:
-      "Report completo: metriche incrociate con lettura linguistica — argomenti ricorrenti, sfumature di tono, contesto. PDF che tieni tu.",
+      "Metriche incrociate con sintesi linguistica: argomenti ricorrenti, sfumature di tono, suggerimenti pratici. PDF scaricabile, solo tuo.",
     highlight: "PDF scaricabile",
     Icon: StepIconReport,
     accentClass: "text-accent2",
     numColor: "#0d9488",
     visualClass: "bg-gradient-to-br from-[#f0fdfa] to-[#99f6e4]",
+  },
+] as const;
+
+const chiSeiCards = [
+  {
+    emoji: "💑",
+    title: "Coppia o relazione stabile",
+    body: "Equilibrio, silenzi, riprese: capire chi porta l’iniziativa e come evolve il dialogo nel tempo.",
+    href: "/upload?focus=coppia",
+    cta: "Vai al percorso coppia",
+    borderClass: "border-accent/25 hover:border-accent/45",
+  },
+  {
+    emoji: "✨",
+    title: "Nuove conoscenze",
+    body: "Interesse reale o cortesia? Ritmo, domande e toni quando la relazione è ancora in fase di esplorazione.",
+    href: "/upload?focus=dating",
+    cta: "Vai al percorso tematico",
+    borderClass: "border-accent3/30 hover:border-accent3/50",
+  },
+  {
+    emoji: "🏠",
+    title: "Famiglia e amici",
+    body: "Gruppi e sottogruppi: chi media, chi resta ai margini, quali temi tornano sempre nel thread.",
+    href: "/upload?focus=coppia",
+    cta: "Analizza il gruppo",
+    borderClass: "border-accent/20 hover:border-accent/40",
+  },
+  {
+    emoji: "💼",
+    title: "Team e professionisti",
+    body: "Carico comunicativo, decisioni async, export anonimi per HR, manager, studio o supervisione.",
+    href: "/upload?audience=aziende",
+    cta: "Percorso organizzazioni",
+    borderClass: "border-accent2/30 hover:border-accent2/50",
   },
 ] as const;
 
@@ -143,89 +179,90 @@ function ReportMockupCard({ dateLabel }: { dateLabel: string }) {
   );
 }
 
-/** Visual hero animato (pattern / segnali) — solo decorativo */
-function HeroAnimatedVisual() {
-  const nBars = 14;
+/** Hero: conversazione animata (decorativo) — keyframe in globals.css.
+ *  Non avvolgere in .hero-fade-up: opacity+transform sul parent possono bloccare
+ *  le animazioni opacity dei figli in alcuni browser. */
+function HeroConversationVisual() {
+  const bubble = "max-w-[88%] rounded-2xl px-3.5 py-2.5 font-ui text-[13px] leading-snug shadow-sm";
   return (
     <div
-      className="hero-make-root relative mx-auto w-full max-w-[400px] select-none lg:mx-0 lg:ml-auto lg:max-w-[440px]"
+      className="relative mx-auto w-full max-w-[400px] select-none lg:mx-0 lg:ml-auto lg:max-w-[420px]"
       aria-hidden
     >
-      <div className="hero-make-aurora pointer-events-none absolute -inset-10 -z-10 rounded-[44px] bg-[conic-gradient(from_120deg_at_50%_50%,#a78bfa_0%,#fbbf24_35%,#2dd4bf_70%,#818cf8_100%)] opacity-80 blur-3xl" />
-
-      <div className="relative rounded-[28px] border border-violet-200/70 bg-white/80 p-[3px] shadow-[0_28px_80px_rgba(99,102,241,0.2),0_12px_32px_rgba(249,115,22,0.08)] backdrop-blur-md">
-        <div className="relative min-h-[280px] overflow-visible rounded-[25px] bg-gradient-to-br from-white via-violet-50/50 to-amber-50/40 px-5 pb-10 pt-6 sm:min-h-[300px]">
-          <div className="flex items-center justify-between gap-3">
-            <span className="rounded-full bg-gradient-to-r from-violet-600 via-indigo-600 to-violet-600 bg-[length:200%_100%] px-3 py-1 font-ui text-[10px] font-bold uppercase tracking-[0.15em] text-white shadow-md">
-              Segnali in tempo reale
-            </span>
-            <div className="flex items-center gap-1.5">
-              <span className="hero-make-dot h-2 w-2 rounded-full bg-emerald-500" />
+      <div className="pointer-events-none absolute -inset-8 -z-10 rounded-[40px] bg-gradient-to-br from-violet-200/50 via-amber-100/40 to-teal-100/50 opacity-90 blur-3xl" />
+      <div className="relative rounded-[24px] border border-[var(--border)] bg-white/95 p-4 shadow-[0_24px_60px_rgba(99,102,241,0.14)]">
+        <div className="mb-4 flex items-center justify-between border-b border-[var(--border)] pb-3">
+          <span className="font-ui text-[11px] font-semibold text-muted">Anteprima conversazione</span>
+          <div className="flex items-center gap-1" aria-hidden>
+            {[0, 1, 2].map((i) => (
               <span
-                className="hero-make-dot h-2 w-2 rounded-full bg-amber-400"
-                style={{ animationDelay: "0.25s" }}
-              />
-              <span
-                className="hero-make-dot h-2 w-2 rounded-full bg-violet-500"
-                style={{ animationDelay: "0.5s" }}
-              />
-            </div>
-          </div>
-
-          <p className="font-ui hero-pattern-pulse mt-4 text-center text-[11px] font-semibold uppercase tracking-widest text-violet-600/90">
-            Pattern estratti dal testo
-          </p>
-
-          <div className="hero-make-waves relative z-[1] mt-6 flex h-[120px] items-end justify-center gap-[5px] px-1 sm:h-[140px] sm:gap-1.5">
-            {Array.from({ length: nBars }, (_, i) => (
-              <div
                 key={i}
-                className="hero-make-wave-bar w-[6px] rounded-full bg-gradient-to-t from-violet-600 via-indigo-500 to-amber-400 sm:w-2"
+                className="h-1.5 w-1.5 rounded-full bg-accent"
+                style={{
+                  animation: "bounceDot 1.1s ease-in-out infinite",
+                  animationDelay: `${i * 0.15}s`,
+                }}
               />
             ))}
           </div>
-
-          <div className="hero-make-spark pointer-events-none absolute left-1/2 top-[52%] z-[2] -translate-x-1/2 -translate-y-1/2">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-white/80 bg-gradient-to-br from-violet-500 to-indigo-600 shadow-lg">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="text-white">
-                <path
-                  d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"
-                  stroke="currentColor"
-                  strokeWidth="1.75"
-                  strokeLinecap="round"
-                  opacity={0.95}
-                />
-                <path
-                  d="M12 8c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4Z"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  fill="currentColor"
-                  fillOpacity="0.2"
-                />
-              </svg>
-            </div>
-          </div>
-
+        </div>
+        <div className="space-y-3">
           <div
-            className="hero-make-float-tag hero-make-tag-1 pointer-events-none absolute left-[4%] top-[22%] z-[3] rounded-full border border-violet-200 bg-white px-2.5 py-1 font-ui text-[10px] font-bold text-violet-700 shadow-md"
+            className={`hero-conv-animated ${bubble} ml-0 mr-auto text-white`}
+            style={{
+              opacity: 0,
+              background: "#6366f1",
+              animation: "chatBubbleIn 0.45s ease-out 0.15s both",
+            }}
           >
-            Ritmo
+            Possiamo parlarne domani?
           </div>
           <div
-            className="hero-make-float-tag hero-make-tag-2 pointer-events-none absolute right-[2%] top-[38%] z-[3] rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 font-ui text-[10px] font-bold text-amber-800 shadow-md"
+            className={`hero-conv-animated ${bubble} ml-auto mr-0 text-foreground`}
+            style={{
+              opacity: 0,
+              background: "#f3f4f6",
+              animation: "chatBubbleIn 0.45s ease-out 0.38s both",
+            }}
           >
-            Squilibrio
+            Sì, però ho bisogno che ci sia chiarezza prima.
           </div>
           <div
-            className="hero-make-float-tag hero-make-tag-3 pointer-events-none absolute bottom-[14%] left-[8%] z-[3] rounded-full border border-teal-200 bg-teal-50 px-2.5 py-1 font-ui text-[10px] font-bold text-teal-800 shadow-md"
+            className={`hero-conv-animated ${bubble} ml-0 mr-auto text-white`}
+            style={{
+              opacity: 0,
+              background: "#6366f1",
+              animation: "chatBubbleIn 0.45s ease-out 0.61s both",
+            }}
           >
-            Ripresa
+            Ok. Io ci sto.
           </div>
-
+        </div>
+        <div className="mt-4 space-y-3">
           <div
-            className="hero-make-orbit-ring pointer-events-none absolute left-1/2 top-1/2 z-0 h-[200px] w-[200px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-violet-200/50 sm:h-[220px] sm:w-[220px]"
-            aria-hidden
-          />
+            className="hero-conv-animated rounded-xl border border-accent2/25 bg-accent2-light/90 px-3 py-2.5"
+            style={{
+              opacity: 0,
+              animation: "insightFadeIn 0.55s ease-out 0.95s both",
+            }}
+          >
+            <p className="font-mono text-[9px] font-medium uppercase tracking-widest text-accent2">Segnale</p>
+            <p className="font-ui mt-1 text-[12px] leading-snug text-foreground">
+              Ripresa rapida dopo tensione — pattern visibile nel thread.
+            </p>
+          </div>
+          <div
+            className="hero-conv-animated rounded-xl border border-accent/25 bg-accent-light/90 px-3 py-2.5"
+            style={{
+              opacity: 0,
+              animation: "insightFadeIn 0.55s ease-out 1.58s both",
+            }}
+          >
+            <p className="font-mono text-[9px] font-medium uppercase tracking-widest text-accent">Struttura</p>
+            <p className="font-ui mt-1 text-[12px] leading-snug text-foreground">
+              Richiesta di chiarezza seguita da adesione — sequenza tensione → riparazione nel testo.
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -433,7 +470,6 @@ export default function Home() {
   const [howItProgress, setHowItProgress] = useState(0);
   const comeFunzionaRef = useRef<HTMLUListElement>(null);
   const howItSectionRef = useRef<HTMLElement>(null);
-  const statsRef = useRef<HTMLElement>(null);
   const reportMockRef = useRef<HTMLDivElement>(null);
   const indigoRef = useRef<HTMLElement>(null);
 
@@ -489,20 +525,6 @@ export default function Home() {
     };
 
     observeCardReveals(comeFunzionaRef.current);
-
-    const statsEl = statsRef.current;
-    if (statsEl) {
-      const io = new IntersectionObserver(
-        (entries) => {
-          for (const e of entries) {
-            if (e.isIntersecting) e.target.classList.add("visible");
-          }
-        },
-        { threshold: 0.2 },
-      );
-      io.observe(statsEl);
-      observers.push(io);
-    }
 
     const reportEl = reportMockRef.current;
     if (reportEl) {
@@ -642,11 +664,8 @@ export default function Home() {
               </div>
             </div>
 
-            <div
-              className="hero-fade-up flex min-w-0 justify-center lg:justify-end"
-              style={{ animationDelay: "0.18s" }}
-            >
-              <HeroAnimatedVisual />
+            <div className="flex min-w-0 justify-center lg:justify-end">
+              <HeroConversationVisual />
             </div>
           </div>
         </div>
@@ -944,6 +963,147 @@ export default function Home() {
       </section>
 
       <section
+        id="chi-sei"
+        className="section-reveal scroll-mt-24 border-b border-[var(--border)] bg-surface/60"
+        aria-labelledby="chi-sei-heading"
+      >
+        <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
+          <p className="font-ui text-xs font-semibold uppercase tracking-widest text-accent2">Per te</p>
+          <h2
+            id="chi-sei-heading"
+            className="font-display mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
+          >
+            Chi sei in questa chat?
+          </h2>
+          <p className="font-ui mt-4 max-w-2xl text-sm leading-relaxed text-muted">
+            Scegli il contesto che ti avvicina di più: stesso metodo, stessa privacy, focus calibrato sul tipo di
+            relazione o gruppo che stai analizzando.
+          </p>
+          <ul className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {chiSeiCards.map((card) => (
+              <li key={card.title}>
+                <div
+                  className={[
+                    "home-lift-card flex h-full flex-col rounded-2xl border-2 bg-white p-6 shadow-sm transition",
+                    card.borderClass,
+                  ].join(" ")}
+                >
+                  <span className="text-3xl" aria-hidden>
+                    {card.emoji}
+                  </span>
+                  <h3 className="font-display mt-4 text-lg font-bold text-foreground">{card.title}</h3>
+                  <p className="font-ui mt-2 flex-1 text-sm leading-relaxed text-muted">{card.body}</p>
+                  <Link
+                    href={card.href}
+                    className="font-ui mt-5 inline-flex text-sm font-semibold text-accent underline-offset-4 hover:underline"
+                  >
+                    {card.cta} →
+                  </Link>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <PlansSection />
+
+      <section
+        className="section-reveal border-b border-[var(--border)] bg-[#1e1b4b]"
+        aria-labelledby="pro-plan-heading"
+      >
+        <div className="mx-auto max-w-[1200px] px-4 sm:px-6">
+          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_280px]">
+            <div className="min-w-0">
+              <span className="inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1 font-ui text-xs font-bold text-white/70">
+                Pro · In arrivo
+              </span>
+              <h2
+                id="pro-plan-heading"
+                className="font-display mt-5 text-3xl font-bold text-white sm:text-4xl"
+              >
+                La tua impronta comunicativa
+              </h2>
+              <p className="font-ui mt-4 max-w-xl text-base leading-relaxed text-white/70">
+                Come comunichi tu — indipendentemente dall&apos;interlocutore. Carica più chat diverse: con il
+                partner, con un amico, con un collega. Subtext Pro identifica i pattern che si ripetono in tutti i
+                contesti: il tuo stile sotto stress, le tendenze strutturali che riproduci ovunque, le
+                contraddizioni tra come ti presenti in relazioni diverse.
+              </p>
+              <ul className="mt-7 space-y-3">
+                {[
+                  "Analisi trasversale su più chat diverse",
+                  "Il tuo stile comunicativo dominante",
+                  "Come cambi in base all'interlocutore",
+                  "Pattern ricorrenti indipendenti dal contesto",
+                  "Contraddizioni tra relazioni diverse",
+                ].map((line) => (
+                  <li key={line} className="flex items-center gap-3">
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent3" aria-hidden />
+                    <span className="font-ui text-sm text-white/80">{line}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-8">
+                <span className="font-display text-4xl font-bold text-white">19,99€</span>
+                <span className="font-ui ml-2 text-sm text-white/50">per profilo trasversale</span>
+              </div>
+              <p className="font-ui mt-2 text-xs text-white/40">
+                Richiede account. Multi-chat. In sviluppo.
+              </p>
+              <button
+                type="button"
+                className="font-ui mt-6 rounded-xl border-2 border-white/30 px-6 py-3 text-sm font-bold text-white transition hover:border-white/60"
+              >
+                Notificami al lancio
+              </button>
+            </div>
+
+            <div className="hidden lg:block" aria-hidden>
+              <div className="rounded-2xl border border-white/15 bg-white/8 p-6 backdrop-blur-sm">
+                <p className="mb-5 font-mono text-[9px] uppercase tracking-widest text-white/40">
+                  PROFILO PRO — ANTEPRIMA
+                </p>
+                <div className="space-y-5">
+                  <div>
+                    <p className="mb-1.5 font-ui text-xs text-white/50">Con il partner</p>
+                    <div className="h-2 overflow-hidden rounded-full bg-white/10">
+                      <div className="h-full w-[65%] rounded-full bg-accent transition-all" />
+                    </div>
+                    <p className="mt-1 font-mono text-[10px] text-white/35">65% iniziativa</p>
+                  </div>
+                  <div>
+                    <p className="mb-1.5 font-ui text-xs text-white/50">Con gli amici</p>
+                    <div className="h-2 overflow-hidden rounded-full bg-white/10">
+                      <div className="h-full w-[42%] rounded-full bg-accent3 transition-all" />
+                    </div>
+                    <p className="mt-1 font-mono text-[10px] text-white/35">42% iniziativa</p>
+                  </div>
+                  <div>
+                    <p className="mb-1.5 font-ui text-xs text-white/50">Al lavoro</p>
+                    <div className="h-2 overflow-hidden rounded-full bg-white/10">
+                      <div className="h-full w-[28%] rounded-full bg-accent2 transition-all" />
+                    </div>
+                    <p className="mt-1 font-mono text-[10px] text-white/35">28% iniziativa</p>
+                  </div>
+                </div>
+                <div className="mt-5 border-t border-white/10" />
+                <div className="mt-4 rounded-xl border border-white/10 bg-white/6 p-4">
+                  <p className="mb-2 font-mono text-[9px] uppercase tracking-widest text-white/35">
+                    PATTERN RILEVATO
+                  </p>
+                  <p className="font-ui text-[12px] leading-relaxed text-white/70">
+                    Prendi l&apos;iniziativa nelle relazioni intime ma aspetti gli altri nel lavoro. Pattern
+                    trasversale — 3 chat analizzate.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section
         className="section-reveal border-b border-[var(--border)]"
         aria-labelledby="use-cases-heading"
       >
@@ -1127,51 +1287,6 @@ export default function Home() {
               </div>
             </div>
           </div>
-          </div>
-        </div>
-      </section>
-
-      <section
-        ref={statsRef}
-        className="home-strip-stats section-reveal stats-strip border-b border-[var(--border)] bg-[var(--text-primary)]"
-        aria-label="Numeri chiave e listini"
-      >
-        <div className="mx-auto max-w-[1200px] px-4 py-12 sm:px-6 sm:py-14">
-          <div className="grid gap-10 md:grid-cols-2 md:gap-6">
-            <div className="stat-count-up home-lift-card relative rounded-2xl border border-white/10 bg-white/5 p-8 text-center md:text-left">
-              <span className="font-ui mb-3 inline-flex self-start rounded-full bg-emerald-500/25 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-200 sm:absolute sm:right-4 sm:top-4 sm:mb-0">
-                Prima analisi gratuita
-              </span>
-              <p className="font-ui text-[11px] font-bold uppercase tracking-widest text-violet-200">
-                Persone
-              </p>
-              <p className="font-display mt-3 text-2xl font-bold leading-tight text-white sm:text-3xl">
-                Scopri cosa sta succedendo davvero
-              </p>
-              <p className="font-display mt-2 text-4xl font-bold text-white sm:text-5xl">da 4,99€</p>
-              <p className="font-ui mt-4 flex flex-wrap gap-x-3 gap-y-1 text-xs text-[#a1a1aa]">
-                <span>Nessun dato salvato</span>
-                <span className="text-white/25">·</span>
-                <span>Analisi anonima</span>
-              </p>
-            </div>
-            <div className="stat-count-up home-lift-card relative rounded-2xl border border-white/10 bg-teal-950/40 p-8 text-center md:text-left">
-              <span className="font-ui mb-3 inline-flex self-start rounded-full bg-emerald-500/25 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-200 sm:absolute sm:right-4 sm:top-4 sm:mb-0">
-                Prima analisi gratuita
-              </span>
-              <p className="font-ui text-[11px] font-bold uppercase tracking-widest text-teal-200">
-                Organizzazioni
-              </p>
-              <p className="font-display mt-3 text-2xl font-bold leading-tight text-white sm:text-3xl">
-                Dati reali su come comunica il tuo team
-              </p>
-              <p className="font-display mt-2 text-4xl font-bold text-white sm:text-5xl">da 29,99€</p>
-              <p className="font-ui mt-4 flex flex-wrap gap-x-3 gap-y-1 text-xs text-[#a1a1aa]">
-                <span>Nessun dato salvato</span>
-                <span className="text-white/25">·</span>
-                <span>Analisi anonima</span>
-              </p>
-            </div>
           </div>
         </div>
       </section>

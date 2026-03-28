@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { audienceFromQueryParam } from "@/lib/context-form-types";
+import {
+  audienceFromQueryParam,
+  focusFromQueryParam,
+  isEnterpriseFocus
+} from "@/lib/context-form-types";
 import { UploadPageClient } from "./UploadPageClient";
 
 export const dynamic = "force-dynamic";
@@ -11,9 +15,19 @@ export async function generateMetadata({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }): Promise<Metadata> {
   const sp = await searchParams;
-  const raw = sp.audience;
-  const param = typeof raw === "string" ? raw : Array.isArray(raw) ? raw[0] : null;
-  const isEnt = audienceFromQueryParam(param) === "enterprise";
+  const rawAudience = sp.audience;
+  const audienceParam =
+    typeof rawAudience === "string"
+      ? rawAudience
+      : Array.isArray(rawAudience)
+        ? rawAudience[0]
+        : null;
+  const rawFocus = sp.focus;
+  const focusParam =
+    typeof rawFocus === "string" ? rawFocus : Array.isArray(rawFocus) ? rawFocus[0] : null;
+  const focus = focusFromQueryParam(focusParam);
+  const isEnt =
+    isEnterpriseFocus(focus) || audienceFromQueryParam(audienceParam) === "enterprise";
   return {
     title: isEnt ? "Carica conversazione — Subtext Work" : "Carica chat — Subtext",
     description: isEnt
